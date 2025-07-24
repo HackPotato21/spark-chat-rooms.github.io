@@ -1,11 +1,806 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { toast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Crown, Users, Send, Image, Video, X, Instagram } from 'lucide-react';
+
+interface Message {
+  id: string;
+  user_name: string;
+  message: string | null;
+  media_url: string | null;
+  media_type: string | null;
+  created_at: string;
+  room_id: string;
+}
+
+interface Room {
+  id: string;
+  room_name: string;
+  session_id: string;
+  room_type: 'public' | 'private';
+  owner_name: string;
+  user_count: number;
+}
+
+interface RoomUser {
+  id: string;
+  user_name: string;
+  is_owner: boolean;
+  last_activity: string;
+}
 
 const Index = () => {
+  const [currentView, setCurrentView] = useState<'home' | 'create' | 'join' | 'chat' | 'publicRooms'>('home');
+  const [sessionId, setSessionId] = useState('');
+  const [userName, setUserName] = useState('');
+  const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [roomUsers, setRoomUsers] = useState<RoomUser[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [isConnected, setIsConnected] = useState(false);
+  const [publicRooms, setPublicRooms] = useState<Room[]>([]);
+  const [roomType, setRoomType] = useState<'public' | 'private'>('public');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const activityRef = useRef<number>();
+  const visibilityRef = useRef<boolean>(true);
+  const channelRef = useRef<any>(null);
+
+  // Activity tracking
+  const updateActivity = useCallback(async () => {
+    if (currentRoom && userName && isConnected) {
+      await supabase.rpc('cleanup_user_from_room', {
+        p_room_id: currentRoom.id,
+        p_user_name: userName
+      });
+      
+      await supabase.from('room_users').upsert({
+        room_id: currentRoom.id,
+        user_name: userName,
+        is_owner: currentRoom.owner_name === userName,
+        last_activity: new Date().toISOString()
+      });
+    }
+  }, [currentRoom, userName, isConnected]);
+
+  // Track user activity
+  useEffect(() => {
+    const resetActivity = () => {
+      if (activityRef.current) clearTimeout(activityRef.current);
+      updateActivity();
+      
+      activityRef.current = window.setTimeout(() => {
+        if (currentRoom && userName) {
+          leaveRoom();
+          toast({
+            title: "Disconnected",
+            description: "You were disconnected due to inactivity."
+          });
+        }
+      }, 5 * 60 * 1000); // 5 minutes
+    };
+
+    const handleActivity = () => {
+      if (visibilityRef.current) resetActivity();
+    };
+
+    const handleVisibilityChange = () => {
+      visibilityRef.current = !document.hidden;
+      if (visibilityRef.current) {
+        resetActivity();
+      }
+    };
+
+    const handleBeforeUnload = () => {
+      if (currentRoom && userName) {
+        navigator.sendBeacon(
+          `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room`,
+          JSON.stringify({
+            p_room_id: currentRoom.id,
+            p_user_name: userName
+          })
+        );
+      }
+    };
+
+    if (isConnected) {
+      document.addEventListener('mousedown', handleActivity);
+      document.addEventListener('keydown', handleActivity);
+      document.addEventListener('scroll', handleActivity);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      resetActivity();
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleActivity);
+      document.removeEventListener('keydown', handleActivity);
+      document.removeEventListener('scroll', handleActivity);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (activityRef.current) clearTimeout(activityRef.current);
+    };
+  }, [isConnected, currentRoom, userName, updateActivity]);
+
+  // Scroll to bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Generate random session ID
+  const generateSessionId = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 8; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setSessionId(result);
+  };
+
+  // Load public rooms
+  const loadPublicRooms = async () => {
+    try {
+      const { data: rooms, error } = await supabase
+        .from('chat_rooms')
+        .select('*')
+        .eq('room_type', 'public');
+
+      if (error) throw error;
+
+      const roomsWithUserCount = await Promise.all(
+        (rooms || []).map(async (room) => {
+          const { data: count } = await supabase.rpc('get_active_room_user_count', {
+            room_uuid: room.id
+          });
+          return { ...room, user_count: count || 0 };
+        })
+      );
+
+      const activeRooms = roomsWithUserCount
+        .filter(room => room.user_count > 0)
+        .sort((a, b) => b.user_count - a.user_count);
+
+      setPublicRooms(activeRooms);
+    } catch (error) {
+      console.error('Error loading public rooms:', error);
+    }
+  };
+
+  // Create or join room
+  const handleJoinRoom = async () => {
+    if (!sessionId || !userName) {
+      toast({
+        title: "Error",
+        description: "Please enter both session ID and username.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Check if room exists
+      const { data: existingRoom, error: roomError } = await supabase
+        .from('chat_rooms')
+        .select('*')
+        .eq('session_id', sessionId)
+        .single();
+
+      if (roomError && roomError.code !== 'PGRST116') {
+        throw roomError;
+      }
+
+      let room = existingRoom;
+
+      // Check if username is already taken in this room
+      if (room) {
+        const { data: existingUser } = await supabase
+          .from('room_users')
+          .select('user_name')
+          .eq('room_id', room.id)
+          .eq('user_name', userName)
+          .single();
+
+        if (existingUser) {
+          toast({
+            title: "Error",
+            description: "Username already in use in this room.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
+      // Create room if it doesn't exist
+      if (!room) {
+        const { data: newRoom, error: createError } = await supabase
+          .from('chat_rooms')
+          .insert({
+            room_name: `Room-${sessionId}`,
+            session_id: sessionId,
+            room_type: roomType,
+            owner_name: userName
+          })
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        room = newRoom;
+
+        // Add system message for room creation
+        await supabase.from('messages').insert({
+          room_id: room.id,
+          user_name: 'System',
+          message: `${userName} created the room`
+        });
+      } else {
+        // Add system message for user joining
+        await supabase.from('messages').insert({
+          room_id: room.id,
+          user_name: 'System',
+          message: `${userName} joined the room`
+        });
+      }
+
+      // Add user to room
+      await supabase.from('room_users').insert({
+        room_id: room.id,
+        user_name: userName,
+        is_owner: room.owner_name === userName
+      });
+
+      setCurrentRoom({ ...room, user_count: 1 });
+      setIsConnected(true);
+      setCurrentView('chat');
+      
+      // Load initial data
+      loadMessages(room.id);
+      loadRoomUsers(room.id);
+      setupRealtimeSubscription(room.id);
+
+      toast({
+        title: "Connected",
+        description: `Joined room ${sessionId} successfully!`
+      });
+    } catch (error) {
+      console.error('Error joining room:', error);
+      toast({
+        title: "Error",
+        description: "Failed to join room. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Load messages
+  const loadMessages = async (roomId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('room_id', roomId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setMessages(data || []);
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    }
+  };
+
+  // Load room users
+  const loadRoomUsers = async (roomId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('room_users')
+        .select('*')
+        .eq('room_id', roomId)
+        .order('joined_at', { ascending: true });
+
+      if (error) throw error;
+      setRoomUsers(data || []);
+    } catch (error) {
+      console.error('Error loading room users:', error);
+    }
+  };
+
+  // Setup realtime subscription
+  const setupRealtimeSubscription = (roomId: string) => {
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+    }
+
+    const channel = supabase
+      .channel(`room-${roomId}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `room_id=eq.${roomId}`
+      }, (payload) => {
+        setMessages(prev => [...prev, payload.new as Message]);
+      })
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'room_users',
+        filter: `room_id=eq.${roomId}`
+      }, () => {
+        loadRoomUsers(roomId);
+      })
+      .on('postgres_changes', {
+        event: 'DELETE',
+        schema: 'public',
+        table: 'room_users',
+        filter: `room_id=eq.${roomId}`
+      }, () => {
+        loadRoomUsers(roomId);
+      })
+      .subscribe();
+
+    channelRef.current = channel;
+  };
+
+  // Send message
+  const sendMessage = async () => {
+    if ((!newMessage.trim() && !selectedFile) || !currentRoom || !userName) return;
+
+    try {
+      let mediaUrl = null;
+      let mediaType = null;
+
+      // Handle file upload
+      if (selectedFile) {
+        if (selectedFile.size > 5 * 1024 * 1024) {
+          toast({
+            title: "Error",
+            description: "File size must be under 5MB.",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        setIsUploading(true);
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `${currentRoom.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('chat-media')
+          .upload(filePath, selectedFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('chat-media')
+          .getPublicUrl(filePath);
+
+        mediaUrl = publicUrl;
+        mediaType = selectedFile.type.startsWith('image/') ? 'image' : 'video';
+        setSelectedFile(null);
+        setIsUploading(false);
+      }
+
+      const { error } = await supabase.from('messages').insert({
+        room_id: currentRoom.id,
+        user_name: userName,
+        message: newMessage.trim() || null,
+        media_url: mediaUrl,
+        media_type: mediaType
+      });
+
+      if (error) throw error;
+
+      setNewMessage('');
+      updateActivity();
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setIsUploading(false);
+      toast({
+        title: "Error",
+        description: "Failed to send message.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Leave room
+  const leaveRoom = async () => {
+    if (!currentRoom || !userName) return;
+
+    try {
+      // Add leave message
+      await supabase.from('messages').insert({
+        room_id: currentRoom.id,
+        user_name: 'System',
+        message: `${userName} left the room`
+      });
+
+      // Remove user from room
+      await supabase.rpc('cleanup_user_from_room', {
+        p_room_id: currentRoom.id,
+        p_user_name: userName
+      });
+
+      // Cleanup
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+
+      setCurrentRoom(null);
+      setIsConnected(false);
+      setMessages([]);
+      setRoomUsers([]);
+      setCurrentView('home');
+    } catch (error) {
+      console.error('Error leaving room:', error);
+    }
+  };
+
+  // Handle file selection
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "File size must be under 5MB.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+        toast({
+          title: "Error",
+          description: "Only images and videos are allowed.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      setSelectedFile(file);
+    }
+  };
+
+  // Format timestamp
+  const formatTime = (timestamp: string) => {
+    return new Date(timestamp).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // Render different views
+  if (currentView === 'chat' && currentRoom) {
+    return (
+      <div className="h-screen flex flex-col bg-background">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b bg-card">
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={leaveRoom}>
+              ← Leave
+            </Button>
+            <div>
+              <h1 className="font-semibold">{currentRoom.room_name}</h1>
+              <p className="text-sm text-muted-foreground">Session: {currentRoom.session_id}</p>
+            </div>
+          </div>
+          <Badge variant={currentRoom.room_type === 'public' ? 'default' : 'secondary'}>
+            {currentRoom.room_type}
+          </Badge>
+        </div>
+
+        <div className="flex flex-1 overflow-hidden">
+          {/* Messages */}
+          <div className="flex-1 flex flex-col">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${
+                    message.user_name === 'System'
+                      ? 'justify-center'
+                      : message.user_name === userName
+                      ? 'justify-end'
+                      : 'justify-start'
+                  }`}
+                >
+                  <div
+                    className={`message-bubble ${
+                      message.user_name === 'System'
+                        ? 'message-bubble-system'
+                        : message.user_name === userName
+                        ? 'message-bubble-own'
+                        : 'message-bubble-other'
+                    }`}
+                  >
+                    {message.user_name !== 'System' && message.user_name !== userName && (
+                      <div className="flex items-center gap-1 mb-1">
+                        <span className="text-xs font-medium">{message.user_name}</span>
+                        {currentRoom.owner_name === message.user_name && (
+                          <Crown className="w-3 h-3 text-yellow-500" />
+                        )}
+                      </div>
+                    )}
+                    
+                    {message.media_url && (
+                      <div className="mb-2">
+                        {message.media_type === 'image' ? (
+                          <img
+                            src={message.media_url}
+                            alt="Shared image"
+                            className="max-w-full h-auto rounded-lg"
+                            style={{ maxHeight: '300px' }}
+                          />
+                        ) : (
+                          <video
+                            src={message.media_url}
+                            controls
+                            className="max-w-full h-auto rounded-lg"
+                            style={{ maxHeight: '300px' }}
+                          />
+                        )}
+                      </div>
+                    )}
+                    
+                    {message.message && <div>{message.message}</div>}
+                    
+                    <div className="text-xs opacity-70 mt-1">
+                      {formatTime(message.created_at)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Message input */}
+            <div className="p-4 border-t bg-card">
+              {selectedFile && (
+                <div className="flex items-center gap-2 mb-2 p-2 bg-muted rounded-lg">
+                  <span className="text-sm">{selectedFile.name}</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setSelectedFile(null)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+              
+              <div className="flex gap-2">
+                <Input
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  disabled={isUploading}
+                />
+                
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                
+                <Button
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                >
+                  <Image className="w-4 h-4" />
+                </Button>
+                
+                <Button onClick={sendMessage} disabled={isUploading}>
+                  {isUploading ? '...' : <Send className="w-4 h-4" />}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Users sidebar */}
+          <div className="w-64 border-l bg-card p-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Users className="w-4 h-4" />
+              <h3 className="font-semibold">Users ({roomUsers.length})</h3>
+            </div>
+            
+            <div className="space-y-2">
+              {roomUsers.map((user) => (
+                <div key={user.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted">
+                  <div className="online-indicator" />
+                  <span className="flex-1">{user.user_name}</span>
+                  {user.is_owner && <Crown className="w-4 h-4 text-yellow-500" />}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Made by footer */}
+        <div className="fixed bottom-4 right-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => window.open('https://www.instagram.com/with._.hacker/', '_blank')}
+            className="flex items-center gap-1 text-xs"
+          >
+            <Instagram className="w-3 h-3" />
+            Made By @with._.hacker
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-2">🔥 Chat Room</h1>
+          <p className="text-muted-foreground">Real-time messaging with session-based rooms</p>
+        </div>
+
+        <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="home">Home</TabsTrigger>
+            <TabsTrigger value="join">Join Room</TabsTrigger>
+            <TabsTrigger value="publicRooms">Public Rooms</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="home" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Create a New Room</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    value={sessionId}
+                    onChange={(e) => setSessionId(e.target.value.toUpperCase())}
+                    placeholder="Enter session ID"
+                    maxLength={8}
+                  />
+                  <Button onClick={generateSessionId}>Generate</Button>
+                </div>
+                
+                <Input
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  placeholder="Enter your username"
+                />
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="w-full" disabled={!sessionId || !userName}>
+                      Create Room
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Room Type</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <RadioGroup value={roomType} onValueChange={(v) => setRoomType(v as any)}>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="public" id="public" />
+                          <Label htmlFor="public">Public - Visible to everyone</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="private" id="private" />
+                          <Label htmlFor="private">Private - Only accessible with session ID</Label>
+                        </div>
+                      </RadioGroup>
+                      <Button onClick={handleJoinRoom} className="w-full">
+                        Create Room
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="join" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Join Existing Room</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Input
+                  value={sessionId}
+                  onChange={(e) => setSessionId(e.target.value.toUpperCase())}
+                  placeholder="Enter session ID"
+                  maxLength={8}
+                />
+                
+                <Input
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  placeholder="Enter your username"
+                />
+
+                <Button onClick={handleJoinRoom} className="w-full" disabled={!sessionId || !userName}>
+                  Join Room
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="publicRooms" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold">Public Rooms</h2>
+              <Button onClick={loadPublicRooms}>Refresh</Button>
+            </div>
+
+            <div className="space-y-4">
+              {publicRooms.length === 0 ? (
+                <Card>
+                  <CardContent className="text-center py-8">
+                    <p className="text-muted-foreground">No active public rooms found.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                publicRooms.map((room) => (
+                  <Card key={room.id} className="cursor-pointer hover:bg-muted/50" onClick={() => {
+                    setSessionId(room.session_id);
+                    setCurrentView('join');
+                  }}>
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="font-semibold">{room.room_name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Owner: {room.owner_name} • Session: {room.session_id}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge>
+                            <Users className="w-3 h-3 mr-1" />
+                            {room.user_count}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Made by footer */}
+        <div className="fixed bottom-4 right-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => window.open('https://www.instagram.com/with._.hacker/', '_blank')}
+            className="flex items-center gap-1 text-xs"
+          >
+            <Instagram className="w-3 h-3" />
+            Made By @with._.hacker
+          </Button>
+        </div>
       </div>
     </div>
   );
