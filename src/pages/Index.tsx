@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Crown, Users, Send, Image, Video, X, Instagram } from 'lucide-react';
+import { Crown, Users, Send, Image, Video, X, Instagram, Moon, Sun, Search } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 interface Message {
   id: string;
@@ -39,7 +40,8 @@ interface RoomUser {
 }
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<'home' | 'create' | 'join' | 'chat' | 'publicRooms'>('home');
+  const { setTheme, theme } = useTheme();
+  const [currentView, setCurrentView] = useState<'home' | 'chat' | 'publicRooms'>('home');
   const [sessionId, setSessionId] = useState('');
   const [userName, setUserName] = useState('');
   const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
@@ -48,15 +50,36 @@ const Index = () => {
   const [newMessage, setNewMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [publicRooms, setPublicRooms] = useState<Room[]>([]);
+  const [filteredPublicRooms, setFilteredPublicRooms] = useState<Room[]>([]);
   const [roomType, setRoomType] = useState<'public' | 'private'>('public');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showRoomTypeDialog, setShowRoomTypeDialog] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const activityRef = useRef<number>();
   const visibilityRef = useRef<boolean>(true);
   const channelRef = useRef<any>(null);
+  const publicRoomsChannelRef = useRef<any>(null);
+  const tabCheckRef = useRef<number>();
+
+  // Tab visibility checking every second
+  useEffect(() => {
+    if (isConnected && currentRoom && userName) {
+      tabCheckRef.current = window.setInterval(() => {
+        if (document.hidden) {
+          // Tab is closed/hidden, remove user from room
+          leaveRoom();
+        }
+      }, 1000);
+    }
+
+    return () => {
+      if (tabCheckRef.current) clearInterval(tabCheckRef.current);
+    };
+  }, [isConnected, currentRoom, userName]);
 
   // Activity tracking
   const updateActivity = useCallback(async () => {
@@ -153,7 +176,7 @@ const Index = () => {
     setSessionId(result);
   };
 
-  // Load public rooms
+  // Load public rooms with real-time updates
   const loadPublicRooms = async () => {
     try {
       const { data: rooms, error } = await supabase
@@ -172,18 +195,69 @@ const Index = () => {
         })
       );
 
-      const activeRooms = roomsWithUserCount
-        .filter(room => room.user_count > 0)
-        .sort((a, b) => b.user_count - a.user_count);
-
-      setPublicRooms(activeRooms);
+      // Sort by user count (most members on top)
+      const sortedRooms = roomsWithUserCount.sort((a, b) => b.user_count - a.user_count);
+      setPublicRooms(sortedRooms);
     } catch (error) {
       console.error('Error loading public rooms:', error);
     }
   };
 
-  // Create or join room
-  const handleJoinRoom = async () => {
+  // Filter public rooms based on search
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredPublicRooms(publicRooms);
+    } else {
+      const filtered = publicRooms.filter(room => 
+        room.room_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        room.session_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        room.owner_name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredPublicRooms(filtered);
+    }
+  }, [searchQuery, publicRooms]);
+
+  // Setup real-time subscription for public rooms
+  useEffect(() => {
+    if (currentView === 'publicRooms') {
+      loadPublicRooms();
+      
+      // Real-time updates for public rooms
+      const publicRoomsChannel = supabase
+        .channel('public-rooms-updates')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'chat_rooms',
+          filter: 'room_type=eq.public'
+        }, () => {
+          loadPublicRooms();
+        })
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'room_users'
+        }, () => {
+          loadPublicRooms();
+        })
+        .subscribe();
+
+      publicRoomsChannelRef.current = publicRoomsChannel;
+
+      // Auto-refresh every 5 seconds
+      const interval = setInterval(loadPublicRooms, 5000);
+
+      return () => {
+        clearInterval(interval);
+        if (publicRoomsChannelRef.current) {
+          supabase.removeChannel(publicRoomsChannelRef.current);
+        }
+      };
+    }
+  }, [currentView]);
+
+  // Handle joining/creating room
+  const handleJoinRoom = async (skipDialog = false) => {
     if (!sessionId || !userName) {
       toast({
         title: "Error",
@@ -224,6 +298,12 @@ const Index = () => {
           });
           return;
         }
+      }
+
+      // If room doesn't exist and we haven't shown the dialog, show it
+      if (!room && !skipDialog) {
+        setShowRoomTypeDialog(true);
+        return;
       }
 
       // Create room if it doesn't exist
@@ -267,6 +347,7 @@ const Index = () => {
       setCurrentRoom({ ...room, user_count: 1 });
       setIsConnected(true);
       setCurrentView('chat');
+      setShowRoomTypeDialog(false);
       
       // Load initial data
       loadMessages(room.id);
@@ -442,6 +523,9 @@ const Index = () => {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
       }
+      if (tabCheckRef.current) {
+        clearInterval(tabCheckRef.current);
+      }
 
       setCurrentRoom(null);
       setIsConnected(false);
@@ -487,7 +571,13 @@ const Index = () => {
     });
   };
 
-  // Render different views
+  // Join room from public rooms list
+  const joinPublicRoom = (room: Room) => {
+    setSessionId(room.session_id);
+    setCurrentView('home');
+  };
+
+  // Render chat view
   if (currentView === 'chat' && currentRoom) {
     return (
       <div className="h-screen flex flex-col bg-background">
@@ -502,9 +592,18 @@ const Index = () => {
               <p className="text-sm text-muted-foreground">Session: {currentRoom.session_id}</p>
             </div>
           </div>
-          <Badge variant={currentRoom.room_type === 'public' ? 'default' : 'secondary'}>
-            {currentRoom.room_type}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant={currentRoom.room_type === 'public' ? 'default' : 'secondary'}>
+              {currentRoom.room_type}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-1 overflow-hidden">
@@ -657,28 +756,36 @@ const Index = () => {
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">🔥 Chat Room</h1>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <h1 className="text-4xl font-bold">🔥 Ignite Chat</h1>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </Button>
+          </div>
           <p className="text-muted-foreground">Real-time messaging with session-based rooms</p>
         </div>
 
         <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="home">Home</TabsTrigger>
-            <TabsTrigger value="join">Join Room</TabsTrigger>
             <TabsTrigger value="publicRooms">Public Rooms</TabsTrigger>
           </TabsList>
 
           <TabsContent value="home" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Create a New Room</CardTitle>
+                <CardTitle>Join or Create Room</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex gap-2">
                   <Input
                     value={sessionId}
                     onChange={(e) => setSessionId(e.target.value.toUpperCase())}
-                    placeholder="Enter session ID"
+                    placeholder="Enter session ID or room code"
                     maxLength={8}
                   />
                   <Button onClick={generateSessionId}>Generate</Button>
@@ -690,59 +797,17 @@ const Index = () => {
                   placeholder="Enter your username"
                 />
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="w-full" disabled={!sessionId || !userName}>
-                      Create Room
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Room Type</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <RadioGroup value={roomType} onValueChange={(v) => setRoomType(v as any)}>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="public" id="public" />
-                          <Label htmlFor="public">Public - Visible to everyone</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="private" id="private" />
-                          <Label htmlFor="private">Private - Only accessible with session ID</Label>
-                        </div>
-                      </RadioGroup>
-                      <Button onClick={handleJoinRoom} className="w-full">
-                        Create Room
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="join" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Join Existing Room</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Input
-                  value={sessionId}
-                  onChange={(e) => setSessionId(e.target.value.toUpperCase())}
-                  placeholder="Enter session ID"
-                  maxLength={8}
-                />
-                
-                <Input
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
-                  placeholder="Enter your username"
-                />
-
-                <Button onClick={handleJoinRoom} className="w-full" disabled={!sessionId || !userName}>
-                  Join Room
+                <Button 
+                  onClick={() => handleJoinRoom()} 
+                  className="w-full" 
+                  disabled={!sessionId || !userName}
+                >
+                  Join / Create Room
                 </Button>
+                
+                <p className="text-sm text-muted-foreground text-center">
+                  Enter an existing room ID to join, or create a new one if it doesn't exist
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -750,22 +815,30 @@ const Index = () => {
           <TabsContent value="publicRooms" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-semibold">Public Rooms</h2>
-              <Button onClick={loadPublicRooms}>Refresh</Button>
+            </div>
+
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search rooms..."
+                className="pl-10"
+              />
             </div>
 
             <div className="space-y-4">
-              {publicRooms.length === 0 ? (
+              {filteredPublicRooms.length === 0 ? (
                 <Card>
                   <CardContent className="text-center py-8">
-                    <p className="text-muted-foreground">No active public rooms found.</p>
+                    <p className="text-muted-foreground">
+                      {searchQuery ? 'No rooms match your search.' : 'No active public rooms found.'}
+                    </p>
                   </CardContent>
                 </Card>
               ) : (
-                publicRooms.map((room) => (
-                  <Card key={room.id} className="cursor-pointer hover:bg-muted/50" onClick={() => {
-                    setSessionId(room.session_id);
-                    setCurrentView('join');
-                  }}>
+                filteredPublicRooms.map((room) => (
+                  <Card key={room.id} className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => joinPublicRoom(room)}>
                     <CardContent className="p-4">
                       <div className="flex justify-between items-center">
                         <div>
@@ -775,7 +848,7 @@ const Index = () => {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge>
+                          <Badge variant="default">
                             <Users className="w-3 h-3 mr-1" />
                             {room.user_count}
                           </Badge>
@@ -788,6 +861,33 @@ const Index = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Room Type Dialog */}
+        <Dialog open={showRoomTypeDialog} onOpenChange={setShowRoomTypeDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Room doesn't exist - Create new room</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Session ID "{sessionId}" doesn't exist. Choose room type to create:
+              </p>
+              <RadioGroup value={roomType} onValueChange={(v) => setRoomType(v as any)}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="public" id="public" />
+                  <Label htmlFor="public">Public - Visible to everyone</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="private" id="private" />
+                  <Label htmlFor="private">Private - Only accessible with session ID</Label>
+                </div>
+              </RadioGroup>
+              <Button onClick={() => handleJoinRoom(true)} className="w-full">
+                Create Room
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Made by footer */}
         <div className="fixed bottom-4 right-4">
