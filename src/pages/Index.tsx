@@ -65,23 +65,31 @@ const Index = () => {
   const publicRoomsChannelRef = useRef<any>(null);
   const tabCheckRef = useRef<number>();
 
-  // Tab visibility checking every second
+  // Tab close detection (only remove user when tab is actually closed)
   useEffect(() => {
     if (isConnected && currentRoom && userName) {
-      tabCheckRef.current = window.setInterval(() => {
-        if (document.hidden) {
-          // Tab is closed/hidden, remove user from room
-          leaveRoom();
-        }
-      }, 1000);
-    }
+      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        // User is actually closing the tab/window
+        leaveRoom();
+        // Use sendBeacon for reliability when tab is closing
+        navigator.sendBeacon(
+          `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room`,
+          JSON.stringify({
+            p_room_id: currentRoom.id,
+            p_user_name: userName
+          })
+        );
+      };
 
-    return () => {
-      if (tabCheckRef.current) clearInterval(tabCheckRef.current);
-    };
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
+    }
   }, [isConnected, currentRoom, userName]);
 
-  // Activity tracking
+  // Activity tracking (kick after 5 minutes of inactivity)
   const updateActivity = useCallback(async () => {
     if (currentRoom && userName && isConnected) {
       await supabase.rpc('cleanup_user_from_room', {
@@ -98,7 +106,7 @@ const Index = () => {
     }
   }, [currentRoom, userName, isConnected]);
 
-  // Track user activity
+  // Track user activity for 5-minute timeout (but don't kick on tab switch)
   useEffect(() => {
     const resetActivity = () => {
       if (activityRef.current) clearTimeout(activityRef.current);
@@ -116,34 +124,15 @@ const Index = () => {
     };
 
     const handleActivity = () => {
-      if (visibilityRef.current) resetActivity();
-    };
-
-    const handleVisibilityChange = () => {
-      visibilityRef.current = !document.hidden;
-      if (visibilityRef.current) {
-        resetActivity();
-      }
-    };
-
-    const handleBeforeUnload = () => {
-      if (currentRoom && userName) {
-        navigator.sendBeacon(
-          `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room`,
-          JSON.stringify({
-            p_room_id: currentRoom.id,
-            p_user_name: userName
-          })
-        );
-      }
+      // Always reset activity on user interaction, regardless of tab visibility
+      resetActivity();
     };
 
     if (isConnected) {
       document.addEventListener('mousedown', handleActivity);
       document.addEventListener('keydown', handleActivity);
       document.addEventListener('scroll', handleActivity);
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      window.addEventListener('beforeunload', handleBeforeUnload);
+      document.addEventListener('focus', handleActivity);
       resetActivity();
     }
 
@@ -151,8 +140,7 @@ const Index = () => {
       document.removeEventListener('mousedown', handleActivity);
       document.removeEventListener('keydown', handleActivity);
       document.removeEventListener('scroll', handleActivity);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('focus', handleActivity);
       if (activityRef.current) clearTimeout(activityRef.current);
     };
   }, [isConnected, currentRoom, userName, updateActivity]);
