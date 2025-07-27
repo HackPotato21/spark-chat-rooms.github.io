@@ -177,7 +177,7 @@ All colors MUST be HSL.
   }
 
   .room-card {
-    @apply transition-all duration-300 hover:scale-102 hover:shadow-lg hover:shadow-primary/10;
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/10;
   }
 
   .theme-transition {
