@@ -582,24 +582,25 @@ const Index = () => {
     return (
       <div className="h-screen flex flex-col bg-background">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b bg-card">
+        <div className="flex items-center justify-between p-4 border-b bg-card slide-enter">
           <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={leaveRoom}>
+            <Button variant="outline" onClick={leaveRoom} className="animated-button hover-glow">
               ← Leave
             </Button>
-            <div>
+            <div className="fade-enter">
               <h1 className="font-semibold">{currentRoom.room_name}</h1>
               <p className="text-sm text-muted-foreground">Session: {currentRoom.session_id}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant={currentRoom.room_type === 'public' ? 'default' : 'secondary'}>
+            <Badge variant={currentRoom.room_type === 'public' ? 'default' : 'secondary'} className="bounce-enter">
               {currentRoom.room_type}
             </Badge>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="animated-button hover-glow theme-transition"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
@@ -706,11 +707,12 @@ const Index = () => {
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
+                  className="animated-button hover-glow"
                 >
                   <Image className="w-4 h-4" />
                 </Button>
                 
-                <Button onClick={sendMessage} disabled={isUploading}>
+                <Button onClick={sendMessage} disabled={isUploading} className="animated-button hover-glow">
                   {isUploading ? '...' : <Send className="w-4 h-4" />}
                 </Button>
               </div>
@@ -718,18 +720,22 @@ const Index = () => {
           </div>
 
           {/* Users sidebar */}
-          <div className="w-64 border-l bg-card p-4">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="w-64 border-l bg-card p-4 slide-enter">
+            <div className="flex items-center gap-2 mb-4 fade-enter">
               <Users className="w-4 h-4" />
               <h3 className="font-semibold">Users ({roomUsers.length})</h3>
             </div>
             
             <div className="space-y-2">
-              {roomUsers.map((user) => (
-                <div key={user.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted">
+              {roomUsers.map((user, index) => (
+                <div 
+                  key={user.id} 
+                  className="flex items-center gap-2 p-2 rounded-lg bg-muted hover-scale transition-all duration-200"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
                   <div className="online-indicator" />
                   <span className="flex-1">{user.user_name}</span>
-                  {user.is_owner && <Crown className="w-4 h-4 text-yellow-500" />}
+                  {user.is_owner && <Crown className="w-4 h-4 text-yellow-500 animate-float" />}
                 </div>
               ))}
             </div>
@@ -755,57 +761,60 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 fade-enter">
           <div className="flex items-center justify-center gap-4 mb-4">
-            <h1 className="text-4xl font-bold">🔥 Ignite Chat</h1>
+            <h1 className="text-4xl font-bold bounce-enter">🔥 Ignite Chat</h1>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="animated-button hover-glow theme-transition"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
           </div>
-          <p className="text-muted-foreground">Real-time messaging with session-based rooms</p>
+          <p className="text-muted-foreground slide-enter">Real-time messaging with session-based rooms</p>
         </div>
 
-        <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="home">Home</TabsTrigger>
-            <TabsTrigger value="publicRooms">Public Rooms</TabsTrigger>
+        <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)} className="w-full slide-enter">
+          <TabsList className="grid w-full grid-cols-2 hover-glow">
+            <TabsTrigger value="home" className="animated-button">Home</TabsTrigger>
+            <TabsTrigger value="publicRooms" className="animated-button">Public Rooms</TabsTrigger>
           </TabsList>
 
           <TabsContent value="home" className="space-y-6">
-            <Card>
-              <CardHeader>
+            <Card className="slide-enter hover-glow">
+              <CardHeader className="fade-enter">
                 <CardTitle>Join or Create Room</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex gap-2">
+                <div className="flex gap-2 fade-enter">
                   <Input
                     value={sessionId}
                     onChange={(e) => setSessionId(e.target.value.toUpperCase())}
                     placeholder="Enter session ID or room code"
                     maxLength={8}
+                    className="theme-transition"
                   />
-                  <Button onClick={generateSessionId}>Generate</Button>
+                  <Button onClick={generateSessionId} className="animated-button hover-glow">Generate</Button>
                 </div>
                 
                 <Input
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                   placeholder="Enter your username"
+                  className="fade-enter theme-transition"
                 />
 
                 <Button 
                   onClick={() => handleJoinRoom()} 
-                  className="w-full" 
+                  className="w-full animated-button hover-glow" 
                   disabled={!sessionId || !userName}
                 >
                   Join / Create Room
                 </Button>
                 
-                <p className="text-sm text-muted-foreground text-center">
+                <p className="text-sm text-muted-foreground text-center fade-enter">
                   Enter an existing room ID to join, or create a new one if it doesn't exist
                 </p>
               </CardContent>
@@ -813,23 +822,23 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="publicRooms" className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center fade-enter">
               <h2 className="text-2xl font-semibold">Public Rooms</h2>
             </div>
 
-            <div className="relative">
+            <div className="relative slide-enter">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search rooms..."
-                className="pl-10"
+                className="pl-10 theme-transition"
               />
             </div>
 
             <div className="space-y-4">
               {filteredPublicRooms.length === 0 ? (
-                <Card>
+                <Card className="slide-enter">
                   <CardContent className="text-center py-8">
                     <p className="text-muted-foreground">
                       {searchQuery ? 'No rooms match your search.' : 'No active public rooms found.'}
@@ -837,8 +846,13 @@ const Index = () => {
                   </CardContent>
                 </Card>
               ) : (
-                filteredPublicRooms.map((room) => (
-                  <Card key={room.id} className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => joinPublicRoom(room)}>
+                filteredPublicRooms.map((room, index) => (
+                  <Card 
+                    key={room.id} 
+                    className="cursor-pointer room-card animated-button" 
+                    onClick={() => joinPublicRoom(room)}
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
                     <CardContent className="p-4">
                       <div className="flex justify-between items-center">
                         <div>
@@ -848,7 +862,7 @@ const Index = () => {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant="default">
+                          <Badge variant="default" className="bounce-enter">
                             <Users className="w-3 h-3 mr-1" />
                             {room.user_count}
                           </Badge>
@@ -864,25 +878,25 @@ const Index = () => {
 
         {/* Room Type Dialog */}
         <Dialog open={showRoomTypeDialog} onOpenChange={setShowRoomTypeDialog}>
-          <DialogContent>
-            <DialogHeader>
+          <DialogContent className="slide-enter">
+            <DialogHeader className="fade-enter">
               <DialogTitle>Room doesn't exist - Create new room</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground fade-enter">
                 Session ID "{sessionId}" doesn't exist. Choose room type to create:
               </p>
-              <RadioGroup value={roomType} onValueChange={(v) => setRoomType(v as any)}>
-                <div className="flex items-center space-x-2">
+              <RadioGroup value={roomType} onValueChange={(v) => setRoomType(v as any)} className="space-y-2">
+                <div className="flex items-center space-x-2 fade-enter hover-scale transition-all duration-200">
                   <RadioGroupItem value="public" id="public" />
                   <Label htmlFor="public">Public - Visible to everyone</Label>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 fade-enter hover-scale transition-all duration-200">
                   <RadioGroupItem value="private" id="private" />
                   <Label htmlFor="private">Private - Only accessible with session ID</Label>
                 </div>
               </RadioGroup>
-              <Button onClick={() => handleJoinRoom(true)} className="w-full">
+              <Button onClick={() => handleJoinRoom(true)} className="w-full animated-button hover-glow">
                 Create Room
               </Button>
             </div>

@@ -107,16 +107,23 @@ All colors MUST be HSL.
 @layer base {
   * {
     @apply border-border;
+    transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
 @layer components {
   .message-bubble {
-    @apply rounded-2xl px-4 py-2 max-w-xs break-words;
+    @apply rounded-2xl px-4 py-2 max-w-xs break-words transition-all duration-300 ease-out;
+    animation: fade-in 0.3s ease-out, scale-in 0.2s ease-out;
   }
   
   .message-bubble-own {
@@ -142,5 +149,38 @@ All colors MUST be HSL.
   
   .online-indicator {
     @apply w-3 h-3 bg-[hsl(var(--online-indicator))] rounded-full border-2 border-background;
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-lg hover:shadow-primary/20;
+  }
+
+  .animated-button {
+    @apply transition-all duration-200 hover:scale-105 active:scale-95;
+  }
+
+  .slide-enter {
+    animation: slide-in-up 0.4s ease-out;
+  }
+
+  .fade-enter {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .bounce-enter {
+    animation: bounce-in 0.6s ease-out;
+  }
+
+  .room-card {
+    @apply transition-all duration-300 hover:scale-102 hover:shadow-lg hover:shadow-primary/10;
+  }
+
+  .theme-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
