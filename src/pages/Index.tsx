@@ -65,13 +65,14 @@ const Index = () => {
   const publicRoomsChannelRef = useRef<any>(null);
   const tabCheckRef = useRef<number>();
 
-  // Tab close detection - reliable detection for when user truly leaves
+  // Tab close detection - reliable cleanup when tab closes
   useEffect(() => {
     if (isConnected && currentRoom && userName) {
-      let isPageUnloading = false;
-
-      const cleanupUser = () => {
-        // Use sendBeacon for reliable cleanup when tab is closing
+      const handleBeforeUnload = () => {
+        // Call leaveRoom for immediate cleanup
+        leaveRoom();
+        
+        // Use sendBeacon for additional reliability when tab is closing
         navigator.sendBeacon(
           `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room`,
           JSON.stringify({
@@ -81,33 +82,24 @@ const Index = () => {
         );
       };
 
-      const handleBeforeUnload = () => {
-        isPageUnloading = true;
-        cleanupUser();
-      };
-
       const handlePageHide = () => {
-        if (isPageUnloading) {
-          cleanupUser();
-        }
+        // Also handle page hide event for mobile
+        navigator.sendBeacon(
+          `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room`,
+          JSON.stringify({
+            p_room_id: currentRoom.id,
+            p_user_name: userName
+          })
+        );
       };
 
-      const handleVisibilityChange = () => {
-        // Only cleanup if the page is being unloaded (not just hidden)
-        if (document.hidden && isPageUnloading) {
-          cleanupUser();
-        }
-      };
-
-      // Multiple event listeners for better reliability
+      // Add event listeners
       window.addEventListener('beforeunload', handleBeforeUnload);
       window.addEventListener('pagehide', handlePageHide);
-      document.addEventListener('visibilitychange', handleVisibilityChange);
       
       return () => {
         window.removeEventListener('beforeunload', handleBeforeUnload);
         window.removeEventListener('pagehide', handlePageHide);
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
       };
     }
   }, [isConnected, currentRoom, userName]);
