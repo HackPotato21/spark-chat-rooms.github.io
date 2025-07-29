@@ -69,12 +69,9 @@ const Index = () => {
   useEffect(() => {
     if (isConnected && currentRoom && userName) {
       const handleBeforeUnload = () => {
-        // Call leaveRoom for immediate cleanup
-        leaveRoom();
-        
-        // Use sendBeacon for additional reliability when tab is closing
+        // Use sendBeacon for reliable cleanup when tab is closing
         navigator.sendBeacon(
-          `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room`,
+          `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room_beacon`,
           JSON.stringify({
             p_room_id: currentRoom.id,
             p_user_name: userName
@@ -85,7 +82,7 @@ const Index = () => {
       const handlePageHide = () => {
         // Also handle page hide event for mobile
         navigator.sendBeacon(
-          `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room`,
+          `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room_beacon`,
           JSON.stringify({
             p_room_id: currentRoom.id,
             p_user_name: userName

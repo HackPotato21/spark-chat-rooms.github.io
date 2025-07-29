@@ -145,6 +145,10 @@ export type Database = {
         Args: { p_room_id: string; p_user_name: string }
         Returns: undefined
       }
+      cleanup_user_from_room_beacon: {
+        Args: { p_room_id: string; p_user_name: string }
+        Returns: undefined
+      }
       get_active_room_user_count: {
         Args: { room_uuid: string }
         Returns: number
