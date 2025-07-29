@@ -65,13 +65,13 @@ const Index = () => {
   const publicRoomsChannelRef = useRef<any>(null);
   const tabCheckRef = useRef<number>();
 
-  // Tab close detection (only remove user when tab is actually closed)
+  // Tab close detection - reliable detection for when user truly leaves
   useEffect(() => {
     if (isConnected && currentRoom && userName) {
-      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-        // User is actually closing the tab/window
-        leaveRoom();
-        // Use sendBeacon for reliability when tab is closing
+      let isPageUnloading = false;
+
+      const cleanupUser = () => {
+        // Use sendBeacon for reliable cleanup when tab is closing
         navigator.sendBeacon(
           `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room`,
           JSON.stringify({
@@ -81,10 +81,33 @@ const Index = () => {
         );
       };
 
+      const handleBeforeUnload = () => {
+        isPageUnloading = true;
+        cleanupUser();
+      };
+
+      const handlePageHide = () => {
+        if (isPageUnloading) {
+          cleanupUser();
+        }
+      };
+
+      const handleVisibilityChange = () => {
+        // Only cleanup if the page is being unloaded (not just hidden)
+        if (document.hidden && isPageUnloading) {
+          cleanupUser();
+        }
+      };
+
+      // Multiple event listeners for better reliability
       window.addEventListener('beforeunload', handleBeforeUnload);
+      window.addEventListener('pagehide', handlePageHide);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
       
       return () => {
         window.removeEventListener('beforeunload', handleBeforeUnload);
+        window.removeEventListener('pagehide', handlePageHide);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
       };
     }
   }, [isConnected, currentRoom, userName]);
