@@ -70,23 +70,27 @@ const Index = () => {
     if (isConnected && currentRoom && userName) {
       const handleBeforeUnload = () => {
         // Use sendBeacon for reliable cleanup when tab is closing
+        const blob = new Blob([JSON.stringify({
+          p_room_id: currentRoom.id,
+          p_user_name: userName
+        })], { type: 'application/json' });
+        
         navigator.sendBeacon(
           `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room_beacon`,
-          JSON.stringify({
-            p_room_id: currentRoom.id,
-            p_user_name: userName
-          })
+          blob
         );
       };
 
       const handlePageHide = () => {
         // Also handle page hide event for mobile
+        const blob = new Blob([JSON.stringify({
+          p_room_id: currentRoom.id,
+          p_user_name: userName
+        })], { type: 'application/json' });
+        
         navigator.sendBeacon(
           `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room_beacon`,
-          JSON.stringify({
-            p_room_id: currentRoom.id,
-            p_user_name: userName
-          })
+          blob
         );
       };
 
