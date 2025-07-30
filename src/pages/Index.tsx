@@ -292,7 +292,18 @@ const Index = () => {
       let room = existingRoom;
 
       // Clean up any existing instances of this user in this room first
+      let wasAlreadyInRoom = false;
       if (room) {
+        // Check if user was already in room
+        const { data: existingUser } = await supabase
+          .from('room_users')
+          .select('user_name')
+          .eq('room_id', room.id)
+          .eq('user_name', userName)
+          .maybeSingle();
+        
+        wasAlreadyInRoom = !!existingUser;
+
         await supabase.rpc('cleanup_user_from_room', {
           p_room_id: room.id,
           p_user_name: userName
@@ -334,8 +345,8 @@ const Index = () => {
           user_name: 'System',
           message: `${userName} created the room`
         });
-      } else {
-        // Add system message for user joining
+      } else if (!wasAlreadyInRoom) {
+        // Only add join message if user wasn't already in the room
         await supabase.from('messages').insert({
           room_id: room.id,
           user_name: 'System',
