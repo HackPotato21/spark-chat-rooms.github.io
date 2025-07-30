@@ -291,23 +291,19 @@ const Index = () => {
 
       let room = existingRoom;
 
-      // Check if username is already taken in this room
+      // Clean up any existing instances of this user in this room first
       if (room) {
-        const { data: existingUser } = await supabase
-          .from('room_users')
-          .select('user_name')
-          .eq('room_id', room.id)
-          .eq('user_name', userName)
-          .maybeSingle();
+        await supabase.rpc('cleanup_user_from_room', {
+          p_room_id: room.id,
+          p_user_name: userName
+        });
 
-        if (existingUser) {
-          toast({
-            title: "Error",
-            description: "Username already in use in this room.",
-            variant: "destructive"
-          });
-          return;
-        }
+        // Double check - remove any lingering records directly
+        await supabase
+          .from('room_users')
+          .delete()
+          .eq('room_id', room.id)
+          .eq('user_name', userName);
       }
 
       // If room doesn't exist and we haven't shown the dialog, show it
