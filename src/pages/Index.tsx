@@ -298,7 +298,7 @@ const Index = () => {
           .select('user_name')
           .eq('room_id', room.id)
           .eq('user_name', userName)
-          .single();
+          .maybeSingle();
 
         if (existingUser) {
           toast({
