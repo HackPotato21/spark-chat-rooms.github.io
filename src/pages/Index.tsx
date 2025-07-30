@@ -68,7 +68,11 @@ const Index = () => {
   // Tab close detection - reliable cleanup when tab closes
   useEffect(() => {
     if (isConnected && currentRoom && userName) {
-      const handleBeforeUnload = () => {
+      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        // Show confirmation dialog
+        e.preventDefault();
+        e.returnValue = 'Closing this tab will remove you from the chat room. Are you sure you want to leave?';
+        
         // Use sendBeacon for reliable cleanup when tab is closing
         const blob = new Blob([JSON.stringify({
           p_room_id: currentRoom.id,
@@ -79,6 +83,8 @@ const Index = () => {
           `https://evqwblpumuhemkixmsyw.supabase.co/rest/v1/rpc/cleanup_user_from_room_beacon`,
           blob
         );
+        
+        return 'Closing this tab will remove you from the chat room. Are you sure you want to leave?';
       };
 
       const handlePageHide = () => {
