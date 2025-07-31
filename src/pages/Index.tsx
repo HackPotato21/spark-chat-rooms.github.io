@@ -64,6 +64,7 @@ const Index = () => {
   const channelRef = useRef<any>(null);
   const publicRoomsChannelRef = useRef<any>(null);
   const tabCheckRef = useRef<number>();
+  const roomUsersIntervalRef = useRef<NodeJS.Timeout>();
 
   // Tab close detection - reliable cleanup when tab closes
   useEffect(() => {
@@ -370,6 +371,7 @@ const Index = () => {
       loadMessages(room.id);
       loadRoomUsers(room.id);
       setupRealtimeSubscription(room.id);
+      setupRoomUsersInterval(room.id);
 
       toast({
         title: "Connected",
@@ -454,6 +456,21 @@ const Index = () => {
     channelRef.current = channel;
   };
 
+  // Setup room users refresh interval
+  const setupRoomUsersInterval = (roomId: string) => {
+    // Clear existing interval
+    if (roomUsersIntervalRef.current) {
+      clearInterval(roomUsersIntervalRef.current);
+    }
+
+    // Update room users every second
+    const interval = setInterval(() => {
+      loadRoomUsers(roomId);
+    }, 1000);
+
+    roomUsersIntervalRef.current = interval;
+  };
+
   // Send message
   const sendMessage = async () => {
     if ((!newMessage.trim() && !selectedFile) || !currentRoom || !userName) return;
@@ -522,12 +539,15 @@ const Index = () => {
     if (!currentRoom || !userName) return;
 
     try {
-      // Add leave message FIRST
+      // Add leave message FIRST and wait for it to be sent
       await supabase.from('messages').insert({
         room_id: currentRoom.id,
         user_name: 'System',
         message: `${userName} left the room`
       });
+
+      // Small delay to ensure message is visible before cleanup
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Remove user from room with cleanup function
       await supabase.rpc('cleanup_user_from_room', {
@@ -569,6 +589,10 @@ const Index = () => {
     }
     if (activityRef.current) {
       clearTimeout(activityRef.current);
+    }
+    if (roomUsersIntervalRef.current) {
+      clearInterval(roomUsersIntervalRef.current);
+      roomUsersIntervalRef.current = undefined;
     }
 
     // Reset all state
