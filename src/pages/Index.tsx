@@ -522,36 +522,65 @@ const Index = () => {
     if (!currentRoom || !userName) return;
 
     try {
-      // Add leave message
+      // Add leave message FIRST
       await supabase.from('messages').insert({
         room_id: currentRoom.id,
         user_name: 'System',
         message: `${userName} left the room`
       });
 
-      // Remove user from room
+      // Remove user from room with cleanup function
       await supabase.rpc('cleanup_user_from_room', {
         p_room_id: currentRoom.id,
         p_user_name: userName
       });
 
-      // Cleanup
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
-      }
-      if (tabCheckRef.current) {
-        clearInterval(tabCheckRef.current);
-      }
+      // Double check - remove any lingering records directly
+      await supabase
+        .from('room_users')
+        .delete()
+        .eq('room_id', currentRoom.id)
+        .eq('user_name', userName);
 
-      setCurrentRoom(null);
-      setIsConnected(false);
-      setMessages([]);
-      setRoomUsers([]);
-      setCurrentView('home');
+      // Reset all state and cleanup subscriptions
+      resetAppState();
     } catch (error) {
       console.error('Error leaving room:', error);
+      // Even if there's an error, reset the state
+      resetAppState();
     }
+  };
+
+  // Reset all app state
+  const resetAppState = () => {
+    // Cleanup realtime subscriptions
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+    if (publicRoomsChannelRef.current) {
+      supabase.removeChannel(publicRoomsChannelRef.current);
+      publicRoomsChannelRef.current = null;
+    }
+    
+    // Clear all timers
+    if (tabCheckRef.current) {
+      clearInterval(tabCheckRef.current);
+    }
+    if (activityRef.current) {
+      clearTimeout(activityRef.current);
+    }
+
+    // Reset all state
+    setCurrentRoom(null);
+    setIsConnected(false);
+    setMessages([]);
+    setRoomUsers([]);
+    setNewMessage('');
+    setSelectedFile(null);
+    setSessionId('');
+    setUserName('');
+    setCurrentView('home');
   };
 
   // Handle file selection
