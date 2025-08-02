@@ -463,10 +463,10 @@ const Index = () => {
       clearInterval(roomUsersIntervalRef.current);
     }
 
-    // Update room users every second
+    // Update room users every 0.1 second (100ms)
     const interval = setInterval(() => {
       loadRoomUsers(roomId);
-    }, 1000);
+    }, 100);
 
     roomUsersIntervalRef.current = interval;
   };
