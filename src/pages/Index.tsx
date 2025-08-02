@@ -680,8 +680,13 @@ const Index = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="animated-button hover-glow theme-transition"
+              onClick={() => {
+                // Add liquid animation to body
+                document.body.classList.add('theme-transitioning');
+                setTimeout(() => document.body.classList.remove('theme-transitioning'), 800);
+                setTheme(theme === 'dark' ? 'light' : 'dark');
+              }}
+              className="animated-button hover-glow theme-transition theme-ripple-effect"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
@@ -848,8 +853,13 @@ const Index = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="animated-button hover-glow theme-transition"
+              onClick={() => {
+                // Add liquid animation to body
+                document.body.classList.add('theme-transitioning');
+                setTimeout(() => document.body.classList.remove('theme-transitioning'), 800);
+                setTheme(theme === 'dark' ? 'light' : 'dark');
+              }}
+              className="animated-button hover-glow theme-transition theme-ripple-effect"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>

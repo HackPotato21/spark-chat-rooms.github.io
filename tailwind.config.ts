@@ -207,6 +207,61 @@ export default {
 						transform: 'rotate(3deg)'
 					}
 				},
+				'liquid-theme-transition': {
+					'0%': {
+						transform: 'scale(1) rotate(0deg)',
+						filter: 'hue-rotate(0deg) saturate(1)',
+						background: 'radial-gradient(circle at center, currentColor 0%, transparent 70%)'
+					},
+					'25%': {
+						transform: 'scale(1.02) rotate(1deg)',
+						filter: 'hue-rotate(90deg) saturate(1.2)',
+						background: 'radial-gradient(circle at 30% 30%, currentColor 20%, transparent 80%)'
+					},
+					'50%': {
+						transform: 'scale(1.01) rotate(0deg)',
+						filter: 'hue-rotate(180deg) saturate(1.4)',
+						background: 'radial-gradient(circle at 70% 70%, currentColor 30%, transparent 90%)'
+					},
+					'75%': {
+						transform: 'scale(1.02) rotate(-1deg)',
+						filter: 'hue-rotate(270deg) saturate(1.2)',
+						background: 'radial-gradient(circle at 50% 80%, currentColor 15%, transparent 85%)'
+					},
+					'100%': {
+						transform: 'scale(1) rotate(0deg)',
+						filter: 'hue-rotate(360deg) saturate(1)',
+						background: 'radial-gradient(circle at center, currentColor 0%, transparent 70%)'
+					}
+				},
+				'theme-ripple': {
+					'0%': {
+						transform: 'scale(0)',
+						opacity: '0.8'
+					},
+					'50%': {
+						transform: 'scale(1.5)',
+						opacity: '0.4'
+					},
+					'100%': {
+						transform: 'scale(3)',
+						opacity: '0'
+					}
+				},
+				'color-shift': {
+					'0%': {
+						filter: 'hue-rotate(0deg) brightness(1) contrast(1)'
+					},
+					'33%': {
+						filter: 'hue-rotate(120deg) brightness(1.1) contrast(1.1)'
+					},
+					'66%': {
+						filter: 'hue-rotate(240deg) brightness(0.9) contrast(1.2)'
+					},
+					'100%': {
+						filter: 'hue-rotate(360deg) brightness(1) contrast(1)'
+					}
+				},
 				'float': {
 					'0%, 100%': {
 						transform: 'translateY(0px)'
@@ -232,6 +287,9 @@ export default {
 				'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
 				'wiggle': 'wiggle 1s ease-in-out infinite',
 				'float': 'float 3s ease-in-out infinite',
+				'liquid-theme': 'liquid-theme-transition 0.8s ease-in-out',
+				'theme-ripple': 'theme-ripple 0.6s ease-out',
+				'color-shift': 'color-shift 0.5s ease-in-out',
 				'enter': 'fade-in 0.3s ease-out, scale-in 0.2s ease-out',
 				'exit': 'fade-out 0.3s ease-out, scale-out 0.2s ease-out'
 			}
