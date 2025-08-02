@@ -539,21 +539,29 @@ const Index = () => {
     if (!currentRoom || !userName) return;
 
     try {
-      // Add leave message FIRST and wait for it to be sent
-      await supabase.from('messages').insert({
+      // Add leave message FIRST
+      const { error: messageError } = await supabase.from('messages').insert({
         room_id: currentRoom.id,
         user_name: 'System',
         message: `${userName} left the room`
       });
 
-      // Small delay to ensure message is visible before cleanup
-      await new Promise(resolve => setTimeout(resolve, 100));
+      if (messageError) {
+        console.error('Error sending leave message:', messageError);
+      }
+
+      // Wait a bit longer to ensure message is visible and real-time updates have processed
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Remove user from room with cleanup function
-      await supabase.rpc('cleanup_user_from_room', {
+      const { error: cleanupError } = await supabase.rpc('cleanup_user_from_room', {
         p_room_id: currentRoom.id,
         p_user_name: userName
       });
+
+      if (cleanupError) {
+        console.error('Error in cleanup function:', cleanupError);
+      }
 
       // Double check - remove any lingering records directly
       await supabase
@@ -561,6 +569,9 @@ const Index = () => {
         .delete()
         .eq('room_id', currentRoom.id)
         .eq('user_name', userName);
+
+      // Wait another moment to ensure room user list updates
+      await new Promise(resolve => setTimeout(resolve, 200));
 
       // Reset all state and cleanup subscriptions
       resetAppState();
