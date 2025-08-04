@@ -845,129 +845,209 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8 fade-enter">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <h1 className="text-4xl font-bold bounce-enter">🔥 Ignite Chat</h1>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                // Add liquid animation to body
-                document.body.classList.add('theme-transitioning');
-                setTimeout(() => document.body.classList.remove('theme-transitioning'), 800);
-                setTheme(theme === 'dark' ? 'light' : 'dark');
-              }}
-              className="animated-button hover-glow theme-transition theme-ripple-effect"
-            >
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </Button>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse-glow"></div>
+      </div>
+
+      <div className="relative z-10 p-6">
+        <div className="max-w-6xl mx-auto">
+          {/* Hero Header */}
+          <div className="text-center mb-12 fade-enter">
+            <div className="flex items-center justify-center gap-6 mb-6">
+              <div className="relative">
+                <h1 className="text-6xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bounce-enter animate-pulse-glow">
+                  Ignite Chat
+                </h1>
+                <div className="absolute -inset-4 bg-primary/20 rounded-2xl blur-xl opacity-30 animate-pulse-glow"></div>
+              </div>
+              <Button
+                variant="ghost"
+                size="lg"
+                onClick={() => {
+                  document.body.classList.add('theme-transitioning');
+                  setTimeout(() => document.body.classList.remove('theme-transitioning'), 800);
+                  setTheme(theme === 'dark' ? 'light' : 'dark');
+                }}
+                className="relative overflow-hidden group bg-card/50 backdrop-blur-sm border border-primary/20 hover:border-primary/40 transition-all duration-500 hover:scale-110 hover:rotate-12"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                {theme === 'dark' ? 
+                  <Sun className="w-6 h-6 relative z-10 transition-transform duration-500 group-hover:rotate-180" /> : 
+                  <Moon className="w-6 h-6 relative z-10 transition-transform duration-500 group-hover:rotate-180" />
+                }
+              </Button>
+            </div>
+            <p className="text-xl text-muted-foreground/80 slide-enter max-w-2xl mx-auto leading-relaxed">
+              Experience next-generation real-time messaging with beautiful animations and seamless collaboration
+            </p>
           </div>
-          <p className="text-muted-foreground slide-enter">Real-time messaging with session-based rooms</p>
-        </div>
 
-        <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)} className="w-full slide-enter">
-          <TabsList className="grid w-full grid-cols-2 hover-glow">
-            <TabsTrigger value="home" className="animated-button">Home</TabsTrigger>
-            <TabsTrigger value="publicRooms" className="animated-button">Public Rooms</TabsTrigger>
-          </TabsList>
+          <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)} className="w-full slide-enter">
+            <TabsList className="grid w-full grid-cols-2 bg-card/50 backdrop-blur-sm border border-primary/20 rounded-2xl p-2 mb-8">
+              <TabsTrigger 
+                value="home" 
+                className="relative overflow-hidden rounded-xl transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25"
+              >
+                <span className="relative z-10">🏠 Home</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="publicRooms" 
+                className="relative overflow-hidden rounded-xl transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25"
+              >
+                <span className="relative z-10">🌐 Public Rooms</span>
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="home" className="space-y-6">
-            <Card className="slide-enter hover-glow">
-              <CardHeader className="fade-enter">
-                <CardTitle>Join or Create Room</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-2 fade-enter">
-                  <Input
-                    value={sessionId}
-                    onChange={(e) => setSessionId(e.target.value.toUpperCase())}
-                    placeholder="Enter session ID or room code"
-                    maxLength={8}
-                    className="theme-transition"
-                  />
-                  <Button onClick={generateSessionId} className="animated-button hover-glow">Generate</Button>
-                </div>
-                
-                <Input
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
-                  placeholder="Enter your username"
-                  className="fade-enter theme-transition"
-                />
-
-                <Button 
-                  onClick={() => handleJoinRoom()} 
-                  className="w-full animated-button hover-glow" 
-                  disabled={!sessionId || !userName}
-                >
-                  Join / Create Room
-                </Button>
-                
-                <p className="text-sm text-muted-foreground text-center fade-enter">
-                  Enter an existing room ID to join, or create a new one if it doesn't exist
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="publicRooms" className="space-y-6">
-            <div className="flex justify-between items-center fade-enter">
-              <h2 className="text-2xl font-semibold">Public Rooms</h2>
-            </div>
-
-            <div className="relative slide-enter">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search rooms..."
-                className="pl-10 theme-transition"
-              />
-            </div>
-
-            <div className="space-y-4">
-              {filteredPublicRooms.length === 0 ? (
-                <Card className="slide-enter">
-                  <CardContent className="text-center py-8">
-                    <p className="text-muted-foreground">
-                      {searchQuery ? 'No rooms match your search.' : 'No active public rooms found.'}
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : (
-                filteredPublicRooms.map((room, index) => (
-                  <Card 
-                    key={room.id} 
-                    className="cursor-pointer room-card animated-button" 
-                    onClick={() => joinPublicRoom(room)}
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h3 className="font-semibold">{room.room_name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Owner: {room.owner_name} • Session: {room.session_id}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="default" className="bounce-enter">
-                            <Users className="w-3 h-3 mr-1" />
-                            {room.user_count}
-                          </Badge>
-                        </div>
+            <TabsContent value="home" className="space-y-8">
+              <Card className="relative overflow-hidden bg-card/60 backdrop-blur-xl border-2 border-primary/20 shadow-2xl shadow-primary/10 transition-all duration-500 hover:border-primary/40 hover:shadow-3xl hover:shadow-primary/20 hover:scale-[1.02]">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none"></div>
+                <CardHeader className="relative z-10 text-center pb-6">
+                  <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+                    ✨ Join or Create Room
+                  </CardTitle>
+                  <p className="text-muted-foreground/70">Start your journey into seamless communication</p>
+                </CardHeader>
+                <CardContent className="relative z-10 space-y-6 px-8 pb-8">
+                  <div className="space-y-4">
+                    <div className="relative group">
+                      <div className="flex gap-3">
+                        <Input
+                          value={sessionId}
+                          onChange={(e) => setSessionId(e.target.value.toUpperCase())}
+                          placeholder="🔑 Enter session ID or room code"
+                          maxLength={8}
+                          className="bg-background/60 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/50 transition-all duration-300 text-lg py-6 rounded-xl shadow-lg hover:shadow-xl group-hover:scale-[1.01]"
+                        />
+                        <Button 
+                          onClick={generateSessionId} 
+                          className="px-6 py-6 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-xl"
+                        >
+                          🎲 Generate
+                        </Button>
                       </div>
+                      <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
+                    </div>
+                    
+                    <div className="relative group">
+                      <Input
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
+                        placeholder="👤 Enter your username"
+                        className="bg-background/60 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/50 transition-all duration-300 text-lg py-6 rounded-xl shadow-lg hover:shadow-xl group-hover:scale-[1.01]"
+                      />
+                      <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
+                    </div>
+
+                    <Button 
+                      onClick={() => handleJoinRoom()} 
+                      className="w-full py-6 text-lg bg-gradient-to-r from-primary via-accent to-primary hover:from-primary/90 hover:via-accent/90 hover:to-primary/90 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] rounded-xl font-semibold relative overflow-hidden group" 
+                      disabled={!sessionId || !userName}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      <span className="relative z-10">🚀 Join / Create Room</span>
+                    </Button>
+                  </div>
+                  
+                  <div className="text-center">
+                    <p className="text-muted-foreground/60 text-sm leading-relaxed max-w-md mx-auto">
+                      💡 Enter an existing room ID to join instantly, or create a brand new room if it doesn't exist
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="publicRooms" className="space-y-8">
+              <div className="text-center fade-enter">
+                <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+                  🌐 Discover Public Rooms
+                </h2>
+                <p className="text-muted-foreground/70">Join vibrant communities and start chatting instantly</p>
+              </div>
+
+              <div className="relative slide-enter group">
+                <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="🔍 Search rooms by name, owner, or session ID..."
+                  className="pl-14 py-6 text-lg bg-background/60 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/50 transition-all duration-300 rounded-2xl shadow-lg hover:shadow-xl group-hover:scale-[1.01]"
+                />
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
+              </div>
+
+              <div className="grid gap-4">
+                {filteredPublicRooms.length === 0 ? (
+                  <Card className="relative overflow-hidden bg-card/60 backdrop-blur-xl border-2 border-primary/20 shadow-xl">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none"></div>
+                    <CardContent className="relative z-10 text-center py-12">
+                      <div className="text-6xl mb-4">🔍</div>
+                      <p className="text-xl text-muted-foreground mb-2">
+                        {searchQuery ? 'No rooms match your search' : 'No active public rooms found'}
+                      </p>
+                      <p className="text-sm text-muted-foreground/60">
+                        {searchQuery ? 'Try adjusting your search terms' : 'Be the first to create a public room!'}
+                      </p>
                     </CardContent>
                   </Card>
-                ))
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+                ) : (
+                  filteredPublicRooms.map((room, index) => (
+                    <Card 
+                      key={room.id} 
+                      className="relative overflow-hidden cursor-pointer bg-card/60 backdrop-blur-xl border-2 border-primary/20 shadow-xl hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500 hover:scale-[1.02] group" 
+                      onClick={() => joinPublicRoom(room)}
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none"></div>
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                      
+                      <CardContent className="relative z-10 p-6">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+                                {room.room_name}
+                              </h3>
+                            </div>
+                            <div className="space-y-2">
+                              <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                <Crown className="w-4 h-4 text-yellow-500" />
+                                <span>Owner: <span className="font-medium">{room.owner_name}</span></span>
+                              </p>
+                              <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                🔑 Session: <span className="font-mono bg-muted px-2 py-1 rounded">{room.session_id}</span>
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end gap-3">
+                            <Badge 
+                              className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg px-3 py-1.5 text-sm font-semibold rounded-full"
+                            >
+                              <Users className="w-4 h-4 mr-2" />
+                              {room.user_count} {room.user_count === 1 ? 'user' : 'users'}
+                            </Badge>
+                            <Button 
+                              size="sm" 
+                              className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-xl opacity-0 group-hover:opacity-100"
+                            >
+                              Join Now 🚀
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
 
-        {/* Room Type Dialog */}
+          {/* Room Type Dialog */}
         <Dialog open={showRoomTypeDialog} onOpenChange={setShowRoomTypeDialog}>
           <DialogContent className="slide-enter">
             <DialogHeader className="fade-enter">
@@ -994,17 +1074,18 @@ const Index = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Made by footer */}
-        <div className="fixed bottom-4 right-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => window.open('https://www.instagram.com/with._.hacker/', '_blank')}
-            className="flex items-center gap-1 text-xs"
-          >
-            <Instagram className="w-3 h-3" />
-            Made By @with._.hacker
-          </Button>
+          {/* Made by footer */}
+          <div className="fixed bottom-4 right-4 z-20">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.open('https://www.instagram.com/with._.hacker/', '_blank')}
+              className="flex items-center gap-2 text-xs bg-card/50 backdrop-blur-sm border border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105"
+            >
+              <Instagram className="w-4 h-4" />
+              Made By @with._.hacker
+            </Button>
+          </div>
         </div>
       </div>
     </div>
