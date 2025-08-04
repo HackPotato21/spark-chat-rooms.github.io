@@ -845,24 +845,16 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse-glow"></div>
-      </div>
-
+    <div className="min-h-screen bg-background relative">
       <div className="relative z-10 p-6">
         <div className="max-w-6xl mx-auto">
           {/* Hero Header */}
           <div className="text-center mb-12 fade-enter">
             <div className="flex items-center justify-center gap-6 mb-6">
               <div className="relative">
-                <h1 className="text-6xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bounce-enter animate-pulse-glow">
+                <h1 className="text-6xl font-bold text-foreground bounce-enter">
                   Ignite Chat
                 </h1>
-                <div className="absolute -inset-4 bg-primary/20 rounded-2xl blur-xl opacity-30 animate-pulse-glow"></div>
               </div>
               <Button
                 variant="ghost"
@@ -872,83 +864,74 @@ const Index = () => {
                   setTimeout(() => document.body.classList.remove('theme-transitioning'), 800);
                   setTheme(theme === 'dark' ? 'light' : 'dark');
                 }}
-                className="relative overflow-hidden group bg-card/50 backdrop-blur-sm border border-primary/20 hover:border-primary/40 transition-all duration-500 hover:scale-110 hover:rotate-12"
+                className="w-14 h-14 rounded-full shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] dark:shadow-[8px_8px_16px_#0a0a0a,-8px_-8px_16px_#2a2a2a] hover:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:hover:shadow-[inset_8px_8px_16px_#0a0a0a,inset_-8px_-8px_16px_#2a2a2a] transition-all duration-300 bg-background border-0"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 {theme === 'dark' ? 
-                  <Sun className="w-6 h-6 relative z-10 transition-transform duration-500 group-hover:rotate-180" /> : 
-                  <Moon className="w-6 h-6 relative z-10 transition-transform duration-500 group-hover:rotate-180" />
+                  <Sun className="w-6 h-6 transition-transform duration-500 hover:rotate-180" /> : 
+                  <Moon className="w-6 h-6 transition-transform duration-500 hover:rotate-180" />
                 }
               </Button>
             </div>
-            <p className="text-xl text-muted-foreground/80 slide-enter max-w-2xl mx-auto leading-relaxed">
-              Experience next-generation real-time messaging with beautiful animations and seamless collaboration
+            <p className="text-xl text-muted-foreground slide-enter max-w-2xl mx-auto leading-relaxed">
+              Experience next-generation real-time messaging with beautiful neumorphic design
             </p>
           </div>
 
           <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)} className="w-full slide-enter">
-            <TabsList className="grid w-full grid-cols-2 bg-card/50 backdrop-blur-sm border border-primary/20 rounded-2xl p-2 mb-8">
+            <TabsList className="grid w-full grid-cols-2 bg-background rounded-3xl p-3 mb-8 shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:shadow-[inset_8px_8px_16px_#0a0a0a,inset_-8px_-8px_16px_#2a2a2a]">
               <TabsTrigger 
                 value="home" 
-                className="relative overflow-hidden rounded-xl transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25"
+                className="rounded-2xl transition-all duration-300 data-[state=active]:shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] dark:data-[state=active]:shadow-[8px_8px_16px_#0a0a0a,-8px_-8px_16px_#2a2a2a] data-[state=active]:bg-background data-[state=active]:text-primary font-medium"
               >
-                <span className="relative z-10">🏠 Home</span>
+                🏠 Home
               </TabsTrigger>
               <TabsTrigger 
                 value="publicRooms" 
-                className="relative overflow-hidden rounded-xl transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25"
+                className="rounded-2xl transition-all duration-300 data-[state=active]:shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] dark:data-[state=active]:shadow-[8px_8px_16px_#0a0a0a,-8px_-8px_16px_#2a2a2a] data-[state=active]:bg-background data-[state=active]:text-primary font-medium"
               >
-                <span className="relative z-10">🌐 Public Rooms</span>
+                🌐 Public Rooms
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="home" className="space-y-8">
-              <Card className="relative overflow-hidden bg-card/60 backdrop-blur-xl border-2 border-primary/20 shadow-2xl shadow-primary/10 transition-all duration-500 hover:border-primary/40 hover:shadow-3xl hover:shadow-primary/20 hover:scale-[1.02]">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none"></div>
-                <CardHeader className="relative z-10 text-center pb-6">
-                  <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+              <Card className="bg-background shadow-[20px_20px_40px_#d1d9e6,-20px_-20px_40px_#ffffff] dark:shadow-[20px_20px_40px_#0a0a0a,-20px_-20px_40px_#2a2a2a] border-0 rounded-3xl transition-all duration-500 hover:shadow-[25px_25px_50px_#d1d9e6,-25px_-25px_50px_#ffffff] dark:hover:shadow-[25px_25px_50px_#0a0a0a,-25px_-25px_50px_#2a2a2a]">
+                <CardHeader className="text-center pb-6 pt-8">
+                  <CardTitle className="text-3xl font-bold text-primary mb-2">
                     ✨ Join or Create Room
                   </CardTitle>
-                  <p className="text-muted-foreground/70">Start your journey into seamless communication</p>
+                  <p className="text-muted-foreground">Start your journey into seamless communication</p>
                 </CardHeader>
-                <CardContent className="relative z-10 space-y-6 px-8 pb-8">
-                  <div className="space-y-4">
-                    <div className="relative group">
-                      <div className="flex gap-3">
-                        <Input
-                          value={sessionId}
-                          onChange={(e) => setSessionId(e.target.value.toUpperCase())}
-                          placeholder="🔑 Enter session ID or room code"
-                          maxLength={8}
-                          className="bg-background/60 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/50 transition-all duration-300 text-lg py-6 rounded-xl shadow-lg hover:shadow-xl group-hover:scale-[1.01]"
-                        />
-                        <Button 
-                          onClick={generateSessionId} 
-                          className="px-6 py-6 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-xl"
-                        >
-                          🎲 Generate
-                        </Button>
-                      </div>
-                      <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
+                <CardContent className="space-y-6 px-8 pb-8">
+                  <div className="space-y-6">
+                    <div className="flex gap-4">
+                      <Input
+                        value={sessionId}
+                        onChange={(e) => setSessionId(e.target.value.toUpperCase())}
+                        placeholder="🔑 Enter session ID"
+                        maxLength={8}
+                        className="bg-background shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:shadow-[inset_8px_8px_16px_#0a0a0a,inset_-8px_-8px_16px_#2a2a2a] border-0 rounded-2xl text-lg py-6 focus-visible:ring-0 focus-visible:ring-offset-0"
+                      />
+                      <Button 
+                        onClick={generateSessionId} 
+                        className="px-6 py-6 bg-background shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] dark:shadow-[8px_8px_16px_#0a0a0a,-8px_-8px_16px_#2a2a2a] hover:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:hover:shadow-[inset_8px_8px_16px_#0a0a0a,inset_-8px_-8px_16px_#2a2a2a] border-0 rounded-2xl text-primary hover:text-primary transition-all duration-300"
+                      >
+                        🎲 Generate
+                      </Button>
                     </div>
                     
-                    <div className="relative group">
-                      <Input
-                        value={userName}
-                        onChange={(e) => setUserName(e.target.value)}
-                        placeholder="👤 Enter your username"
-                        className="bg-background/60 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/50 transition-all duration-300 text-lg py-6 rounded-xl shadow-lg hover:shadow-xl group-hover:scale-[1.01]"
-                      />
-                      <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
-                    </div>
+                    <Input
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      placeholder="👤 Enter your username"
+                      className="bg-background shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:shadow-[inset_8px_8px_16px_#0a0a0a,inset_-8px_-8px_16px_#2a2a2a] border-0 rounded-2xl text-lg py-6 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    />
 
                     <Button 
                       onClick={() => handleJoinRoom()} 
-                      className="w-full py-6 text-lg bg-gradient-to-r from-primary via-accent to-primary hover:from-primary/90 hover:via-accent/90 hover:to-primary/90 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] rounded-xl font-semibold relative overflow-hidden group" 
+                      className="w-full py-6 text-lg bg-primary shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] dark:shadow-[8px_8px_16px_#0a0a0a,-8px_-8px_16px_#2a2a2a] hover:shadow-[inset_8px_8px_16px_hsl(var(--primary)/0.3),inset_-8px_-8px_16px_hsl(var(--primary)/0.1)] border-0 rounded-2xl font-semibold transition-all duration-300 hover:bg-primary/90" 
                       disabled={!sessionId || !userName}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      <span className="relative z-10">🚀 Join / Create Room</span>
+                      🚀 Join / Create Room
                     </Button>
                   </div>
                   
@@ -963,28 +946,26 @@ const Index = () => {
 
             <TabsContent value="publicRooms" className="space-y-8">
               <div className="text-center fade-enter">
-                <h2 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+                <h2 className="text-4xl font-bold text-primary mb-2">
                   🌐 Discover Public Rooms
                 </h2>
-                <p className="text-muted-foreground/70">Join vibrant communities and start chatting instantly</p>
+                <p className="text-muted-foreground">Join vibrant communities and start chatting instantly</p>
               </div>
 
-              <div className="relative slide-enter group">
+              <div className="relative slide-enter">
                 <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="🔍 Search rooms by name, owner, or session ID..."
-                  className="pl-14 py-6 text-lg bg-background/60 backdrop-blur-sm border-2 border-primary/20 focus:border-primary/50 transition-all duration-300 rounded-2xl shadow-lg hover:shadow-xl group-hover:scale-[1.01]"
+                  className="pl-14 py-6 text-lg bg-background shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:shadow-[inset_8px_8px_16px_#0a0a0a,inset_-8px_-8px_16px_#2a2a2a] border-0 rounded-2xl focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
               </div>
 
-              <div className="grid gap-4">
+              <div className="grid gap-6">
                 {filteredPublicRooms.length === 0 ? (
-                  <Card className="relative overflow-hidden bg-card/60 backdrop-blur-xl border-2 border-primary/20 shadow-xl">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none"></div>
-                    <CardContent className="relative z-10 text-center py-12">
+                  <Card className="bg-background shadow-[20px_20px_40px_#d1d9e6,-20px_-20px_40px_#ffffff] dark:shadow-[20px_20px_40px_#0a0a0a,-20px_-20px_40px_#2a2a2a] border-0 rounded-3xl">
+                    <CardContent className="text-center py-12">
                       <div className="text-6xl mb-4">🔍</div>
                       <p className="text-xl text-muted-foreground mb-2">
                         {searchQuery ? 'No rooms match your search' : 'No active public rooms found'}
@@ -998,42 +979,42 @@ const Index = () => {
                   filteredPublicRooms.map((room, index) => (
                     <Card 
                       key={room.id} 
-                      className="relative overflow-hidden cursor-pointer bg-card/60 backdrop-blur-xl border-2 border-primary/20 shadow-xl hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/20 transition-all duration-500 hover:scale-[1.02] group" 
+                      className="cursor-pointer bg-background shadow-[20px_20px_40px_#d1d9e6,-20px_-20px_40px_#ffffff] dark:shadow-[20px_20px_40px_#0a0a0a,-20px_-20px_40px_#2a2a2a] hover:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:hover:shadow-[inset_8px_8px_16px_#0a0a0a,inset_-8px_-8px_16px_#2a2a2a] border-0 rounded-3xl transition-all duration-500 group" 
                       onClick={() => joinPublicRoom(room)}
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none"></div>
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                      
-                      <CardContent className="relative z-10 p-6">
+                      <CardContent className="p-6">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-3">
-                              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-4 h-4 bg-green-500 rounded-full shadow-[2px_2px_4px_#d1d9e6,-2px_-2px_4px_#ffffff] dark:shadow-[2px_2px_4px_#0a0a0a,-2px_-2px_4px_#2a2a2a]"></div>
                               <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
                                 {room.room_name}
                               </h3>
                             </div>
-                            <div className="space-y-2">
+                            <div className="space-y-3">
                               <p className="text-sm text-muted-foreground flex items-center gap-2">
                                 <Crown className="w-4 h-4 text-yellow-500" />
                                 <span>Owner: <span className="font-medium">{room.owner_name}</span></span>
                               </p>
                               <p className="text-sm text-muted-foreground flex items-center gap-2">
-                                🔑 Session: <span className="font-mono bg-muted px-2 py-1 rounded">{room.session_id}</span>
+                                🔑 Session: 
+                                <span className="font-mono bg-background px-3 py-1 rounded-xl shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] dark:shadow-[inset_4px_4px_8px_#0a0a0a,inset_-4px_-4px_8px_#2a2a2a]">
+                                  {room.session_id}
+                                </span>
                               </p>
                             </div>
                           </div>
-                          <div className="flex flex-col items-end gap-3">
+                          <div className="flex flex-col items-end gap-4">
                             <Badge 
-                              className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg px-3 py-1.5 text-sm font-semibold rounded-full"
+                              className="bg-primary text-primary-foreground shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0a0a0a,-4px_-4px_8px_#2a2a2a] px-4 py-2 text-sm font-semibold rounded-full border-0"
                             >
                               <Users className="w-4 h-4 mr-2" />
                               {room.user_count} {room.user_count === 1 ? 'user' : 'users'}
                             </Badge>
                             <Button 
                               size="sm" 
-                              className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-xl opacity-0 group-hover:opacity-100"
+                              className="bg-background shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#0a0a0a,-6px_-6px_12px_#2a2a2a] hover:shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:hover:shadow-[inset_6px_6px_12px_#0a0a0a,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl text-primary hover:text-primary opacity-0 group-hover:opacity-100 transition-all duration-300"
                             >
                               Join Now 🚀
                             </Button>
@@ -1080,7 +1061,7 @@ const Index = () => {
               variant="ghost"
               size="sm"
               onClick={() => window.open('https://www.instagram.com/with._.hacker/', '_blank')}
-              className="flex items-center gap-2 text-xs bg-card/50 backdrop-blur-sm border border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105"
+              className="flex items-center gap-2 text-xs bg-background shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#0a0a0a,-6px_-6px_12px_#2a2a2a] hover:shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:hover:shadow-[inset_6px_6px_12px_#0a0a0a,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl transition-all duration-300"
             >
               <Instagram className="w-4 h-4" />
               Made By @with._.hacker
