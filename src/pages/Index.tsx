@@ -864,7 +864,7 @@ const Index = () => {
                   setTimeout(() => document.body.classList.remove('theme-transitioning'), 800);
                   setTheme(theme === 'dark' ? 'light' : 'dark');
                 }}
-                className="w-14 h-14 rounded-full shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] dark:shadow-[8px_8px_16px_#0a0a0a,-8px_-8px_16px_#2a2a2a] hover:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:hover:shadow-[inset_8px_8px_16px_#0a0a0a,inset_-8px_-8px_16px_#2a2a2a] transition-all duration-300 bg-background border-0"
+                className="w-14 h-14 rounded-full shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] hover:shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:hover:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] transition-all duration-300 bg-background border-0 flex items-center justify-center"
               >
                 {theme === 'dark' ? 
                   <Sun className="w-6 h-6 transition-transform duration-500 hover:rotate-180" /> : 
@@ -878,17 +878,17 @@ const Index = () => {
           </div>
 
           <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)} className="w-full slide-enter">
-            <TabsList className="grid w-full grid-cols-2 bg-background rounded-3xl p-4 mb-8 shadow-[inset_12px_12px_24px_#c8d2e5,inset_-12px_-12px_24px_#ffffff] dark:shadow-[inset_12px_12px_24px_#0a0a0a,inset_-12px_-12px_24px_#353535]">
+            <TabsList className="grid w-full grid-cols-2 bg-background rounded-2xl p-2 mb-8 shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a] border-0">
               <TabsTrigger 
                 value="home" 
-                className="rounded-2xl transition-all duration-300 data-[state=active]:shadow-[10px_10px_20px_#c8d2e5,-10px_-10px_20px_#ffffff] dark:data-[state=active]:shadow-[10px_10px_20px_#0a0a0a,-10px_-10px_20px_#353535] data-[state=active]:bg-background data-[state=active]:text-primary font-medium py-3 flex items-center gap-2"
+                className="rounded-xl transition-all duration-300 data-[state=active]:shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:data-[state=active]:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] data-[state=active]:bg-background data-[state=active]:text-primary hover:text-primary/80 font-medium py-3 px-4 flex items-center justify-center gap-2 text-sm border-0"
               >
                 <Home className="w-4 h-4" />
                 Home
               </TabsTrigger>
               <TabsTrigger 
                 value="publicRooms" 
-                className="rounded-2xl transition-all duration-300 data-[state=active]:shadow-[10px_10px_20px_#c8d2e5,-10px_-10px_20px_#ffffff] dark:data-[state=active]:shadow-[10px_10px_20px_#0a0a0a,-10px_-10px_20px_#353535] data-[state=active]:bg-background data-[state=active]:text-primary font-medium py-3 flex items-center gap-2"
+                className="rounded-xl transition-all duration-300 data-[state=active]:shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:data-[state=active]:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] data-[state=active]:bg-background data-[state=active]:text-primary hover:text-primary/80 font-medium py-3 px-4 flex items-center justify-center gap-2 text-sm border-0"
               >
                 <Globe className="w-4 h-4" />
                 Public Rooms
@@ -896,7 +896,7 @@ const Index = () => {
             </TabsList>
 
             <TabsContent value="home" className="space-y-8">
-              <Card className="bg-background shadow-[24px_24px_48px_#c8d2e5,-24px_-24px_48px_#ffffff] dark:shadow-[24px_24px_48px_#0a0a0a,-24px_-24px_48px_#353535] border-0 rounded-3xl transition-all duration-500 hover:shadow-[32px_32px_64px_#c8d2e5,-32px_-32px_64px_#ffffff] dark:hover:shadow-[32px_32px_64px_#0a0a0a,-32px_-32px_64px_#353535] hover:scale-[1.02]">
+              <Card className="bg-background shadow-[12px_12px_24px_#d1d9e6,-12px_-12px_24px_#ffffff] dark:shadow-[12px_12px_24px_#0f1419,-12px_-12px_24px_#2a2a2a] border-0 rounded-2xl transition-all duration-500 hover:shadow-[16px_16px_32px_#d1d9e6,-16px_-16px_32px_#ffffff] dark:hover:shadow-[16px_16px_32px_#0f1419,-16px_-16px_32px_#2a2a2a] hover:scale-[1.01]">
                 <CardHeader className="text-center pb-6 pt-8">
                   <CardTitle className="text-3xl font-bold text-primary mb-2 flex items-center justify-center gap-3">
                     <Sparkles className="w-8 h-8 text-primary animate-pulse" />
@@ -914,12 +914,12 @@ const Index = () => {
                           onChange={(e) => setSessionId(e.target.value.toUpperCase())}
                           placeholder="Enter session ID"
                           maxLength={8}
-                          className="pl-12 bg-background shadow-[inset_12px_12px_24px_#c8d2e5,inset_-12px_-12px_24px_#ffffff] dark:shadow-[inset_12px_12px_24px_#0a0a0a,inset_-12px_-12px_24px_#353535] border-0 rounded-2xl text-lg py-6 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_16px_16px_32px_#c8d2e5,inset_-16px_-16px_32px_#ffffff] dark:focus-visible:shadow-[inset_16px_16px_32px_#0a0a0a,inset_-16px_-16px_32px_#353535]"
+                          className="pl-12 bg-background shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl text-lg py-6 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:focus-visible:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a]"
                         />
                       </div>
                       <Button 
                         onClick={generateSessionId} 
-                        className="px-6 py-6 bg-background shadow-[10px_10px_20px_#c8d2e5,-10px_-10px_20px_#ffffff] dark:shadow-[10px_10px_20px_#0a0a0a,-10px_-10px_20px_#353535] hover:shadow-[inset_10px_10px_20px_#c8d2e5,inset_-10px_-10px_20px_#ffffff] dark:hover:shadow-[inset_10px_10px_20px_#0a0a0a,inset_-10px_-10px_20px_#353535] border-0 rounded-2xl text-primary hover:text-primary transition-all duration-300 active:scale-95 flex items-center gap-2"
+                        className="px-6 py-6 bg-background shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] hover:shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:hover:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl text-primary hover:text-primary transition-all duration-300 active:scale-95 flex items-center justify-center gap-2"
                       >
                         <Dice6 className="w-5 h-5" />
                         Generate
@@ -932,13 +932,13 @@ const Index = () => {
                         value={userName}
                         onChange={(e) => setUserName(e.target.value)}
                         placeholder="Enter your username"
-                        className="pl-12 bg-background shadow-[inset_12px_12px_24px_#c8d2e5,inset_-12px_-12px_24px_#ffffff] dark:shadow-[inset_12px_12px_24px_#0a0a0a,inset_-12px_-12px_24px_#353535] border-0 rounded-2xl text-lg py-6 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_16px_16px_32px_#c8d2e5,inset_-16px_-16px_32px_#ffffff] dark:focus-visible:shadow-[inset_16px_16px_32px_#0a0a0a,inset_-16px_-16px_32px_#353535]"
+                        className="pl-12 bg-background shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl text-lg py-6 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:focus-visible:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a]"
                       />
                     </div>
 
                     <Button 
                       onClick={() => handleJoinRoom()} 
-                      className="w-full py-6 text-lg bg-primary shadow-[12px_12px_24px_#c8d2e5,-12px_-12px_24px_#ffffff] dark:shadow-[12px_12px_24px_#0a0a0a,-12px_-12px_24px_#353535] hover:shadow-[inset_12px_12px_24px_hsl(var(--primary)/0.3),inset_-12px_-12px_24px_hsl(var(--primary)/0.1)] border-0 rounded-2xl font-semibold transition-all duration-300 hover:bg-primary/90 active:scale-95 flex items-center justify-center gap-3" 
+                      className="w-full py-6 text-lg bg-primary shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] hover:shadow-[inset_6px_6px_12px_hsl(var(--primary)/0.3),inset_-6px_-6px_12px_hsl(var(--primary)/0.1)] border-0 rounded-xl font-semibold transition-all duration-300 hover:bg-primary/90 active:scale-95 flex items-center justify-center gap-3" 
                       disabled={!sessionId || !userName}
                     >
                       <Zap className="w-5 h-5" />
@@ -971,13 +971,13 @@ const Index = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search rooms by name, owner, or session ID..."
-                  className="pl-14 py-6 text-lg bg-background shadow-[inset_12px_12px_24px_#c8d2e5,inset_-12px_-12px_24px_#ffffff] dark:shadow-[inset_12px_12px_24px_#0a0a0a,inset_-12px_-12px_24px_#353535] border-0 rounded-2xl focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_16px_16px_32px_#c8d2e5,inset_-16px_-16px_32px_#ffffff] dark:focus-visible:shadow-[inset_16px_16px_32px_#0a0a0a,inset_-16px_-16px_32px_#353535]"
+                  className="pl-14 py-6 text-lg bg-background shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:focus-visible:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a]"
                 />
               </div>
 
               <div className="grid gap-6">
                 {filteredPublicRooms.length === 0 ? (
-                  <Card className="bg-background shadow-[24px_24px_48px_#c8d2e5,-24px_-24px_48px_#ffffff] dark:shadow-[24px_24px_48px_#0a0a0a,-24px_-24px_48px_#353535] border-0 rounded-3xl">
+                  <Card className="bg-background shadow-[12px_12px_24px_#d1d9e6,-12px_-12px_24px_#ffffff] dark:shadow-[12px_12px_24px_#0f1419,-12px_-12px_24px_#2a2a2a] border-0 rounded-2xl">
                     <CardContent className="text-center py-12">
                       <Search className="w-16 h-16 text-muted-foreground/40 mx-auto mb-4" />
                       <p className="text-xl text-muted-foreground mb-2">
@@ -992,7 +992,7 @@ const Index = () => {
                   filteredPublicRooms.map((room, index) => (
                     <Card 
                       key={room.id} 
-                      className="cursor-pointer bg-background shadow-[24px_24px_48px_#c8d2e5,-24px_-24px_48px_#ffffff] dark:shadow-[24px_24px_48px_#0a0a0a,-24px_-24px_48px_#353535] hover:shadow-[inset_12px_12px_24px_#c8d2e5,inset_-12px_-12px_24px_#ffffff] dark:hover:shadow-[inset_12px_12px_24px_#0a0a0a,inset_-12px_-12px_24px_#353535] border-0 rounded-3xl transition-all duration-500 group hover:scale-[1.02] active:scale-95" 
+                      className="cursor-pointer bg-background shadow-[12px_12px_24px_#d1d9e6,-12px_-12px_24px_#ffffff] dark:shadow-[12px_12px_24px_#0f1419,-12px_-12px_24px_#2a2a2a] hover:shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:hover:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-2xl transition-all duration-500 group hover:scale-[1.01] active:scale-95" 
                       onClick={() => joinPublicRoom(room)}
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
@@ -1013,7 +1013,7 @@ const Index = () => {
                               <p className="text-sm text-muted-foreground flex items-center gap-2">
                                 <Key className="w-4 h-4 text-primary/60" />
                                 Session: 
-                                <span className="font-mono bg-background px-3 py-1 rounded-xl shadow-[inset_6px_6px_12px_#c8d2e5,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0a0a0a,inset_-6px_-6px_12px_#353535]">
+                                <span className="font-mono bg-background px-3 py-1 rounded-lg shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] dark:shadow-[inset_3px_3px_6px_#0f1419,inset_-3px_-3px_6px_#2a2a2a] text-sm">
                                   {room.session_id}
                                 </span>
                               </p>
@@ -1021,14 +1021,14 @@ const Index = () => {
                           </div>
                           <div className="flex flex-col items-end gap-4">
                             <Badge 
-                              className="bg-primary text-primary-foreground shadow-[6px_6px_12px_#c8d2e5,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#0a0a0a,-6px_-6px_12px_#353535] px-4 py-2 text-sm font-semibold rounded-full border-0"
+                              className="bg-primary text-primary-foreground shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f1419,-4px_-4px_8px_#2a2a2a] px-4 py-2 text-sm font-semibold rounded-full border-0 flex items-center gap-2"
                             >
-                              <Users className="w-4 h-4 mr-2" />
+                              <Users className="w-4 h-4" />
                               {room.user_count} {room.user_count === 1 ? 'user' : 'users'}
                             </Badge>
                             <Button 
                               size="sm" 
-                              className="bg-background shadow-[8px_8px_16px_#c8d2e5,-8px_-8px_16px_#ffffff] dark:shadow-[8px_8px_16px_#0a0a0a,-8px_-8px_16px_#353535] hover:shadow-[inset_8px_8px_16px_#c8d2e5,inset_-8px_-8px_16px_#ffffff] dark:hover:shadow-[inset_8px_8px_16px_#0a0a0a,inset_-8px_-8px_16px_#353535] border-0 rounded-xl text-primary hover:text-primary opacity-0 group-hover:opacity-100 transition-all duration-300 active:scale-95 flex items-center gap-2"
+                              className="bg-background shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f1419,-4px_-4px_8px_#2a2a2a] hover:shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] dark:hover:shadow-[inset_4px_4px_8px_#0f1419,inset_-4px_-4px_8px_#2a2a2a] border-0 rounded-lg text-primary hover:text-primary opacity-0 group-hover:opacity-100 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 px-4 py-2"
                             >
                               Join Now
                               <Zap className="w-4 h-4" />
@@ -1076,7 +1076,7 @@ const Index = () => {
               variant="ghost"
               size="sm"
               onClick={() => window.open('https://www.instagram.com/with._.hacker/', '_blank')}
-              className="flex items-center gap-2 text-xs bg-background shadow-[8px_8px_16px_#c8d2e5,-8px_-8px_16px_#ffffff] dark:shadow-[8px_8px_16px_#0a0a0a,-8px_-8px_16px_#353535] hover:shadow-[inset_8px_8px_16px_#c8d2e5,inset_-8px_-8px_16px_#ffffff] dark:hover:shadow-[inset_8px_8px_16px_#0a0a0a,inset_-8px_-8px_16px_#353535] border-0 rounded-xl transition-all duration-300 active:scale-95"
+              className="flex items-center justify-center gap-2 text-xs bg-background shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f1419,-4px_-4px_8px_#2a2a2a] hover:shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] dark:hover:shadow-[inset_4px_4px_8px_#0f1419,inset_-4px_-4px_8px_#2a2a2a] border-0 rounded-lg transition-all duration-300 active:scale-95 px-3 py-2"
             >
               <Instagram className="w-4 h-4" />
               Made By @with._.hacker
