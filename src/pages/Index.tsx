@@ -52,6 +52,7 @@ const Index = () => {
   const [publicRooms, setPublicRooms] = useState<Room[]>([]);
   const [filteredPublicRooms, setFilteredPublicRooms] = useState<Room[]>([]);
   const [roomType, setRoomType] = useState<'public' | 'private'>('public');
+  const [roomName, setRoomName] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -329,7 +330,7 @@ const Index = () => {
         const { data: newRoom, error: createError } = await supabase
           .from('chat_rooms')
           .insert({
-            room_name: `Room-${sessionId}`,
+            room_name: roomName || `Room-${sessionId}`,
             session_id: sessionId,
             room_type: roomType,
             owner_name: userName
@@ -864,7 +865,7 @@ const Index = () => {
                   setTimeout(() => document.body.classList.remove('theme-transitioning'), 800);
                   setTheme(theme === 'dark' ? 'light' : 'dark');
                 }}
-                className="w-14 h-14 rounded-full shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] hover:shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:hover:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] transition-all duration-300 bg-background border-0 flex items-center justify-center"
+                className="w-14 h-14 rounded-full transition-all duration-300 border border-border hover:border-primary/50 flex items-center justify-center"
               >
                 {theme === 'dark' ? 
                   <Sun className="w-6 h-6 transition-transform duration-500 hover:rotate-180" /> : 
@@ -878,17 +879,17 @@ const Index = () => {
           </div>
 
           <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)} className="w-full slide-enter">
-            <TabsList className="grid w-full grid-cols-2 bg-background rounded-2xl p-2 mb-8 shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a] border-0">
+            <TabsList className="grid w-full grid-cols-2 bg-background rounded-2xl p-2 mb-8 border-0">
               <TabsTrigger 
                 value="home" 
-                className="rounded-xl transition-all duration-300 data-[state=active]:shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:data-[state=active]:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] data-[state=active]:bg-background data-[state=active]:text-primary hover:text-primary/80 font-medium py-3 px-4 flex items-center justify-center gap-2 text-sm border-0"
+                className="rounded-xl transition-all duration-300 data-[state=active]:bg-primary/10 data-[state=active]:text-primary hover:text-primary/80 font-medium py-3 px-4 flex items-center justify-center gap-2 text-sm border-0"
               >
                 <Home className="w-4 h-4" />
                 Home
               </TabsTrigger>
               <TabsTrigger 
                 value="publicRooms" 
-                className="rounded-xl transition-all duration-300 data-[state=active]:shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:data-[state=active]:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] data-[state=active]:bg-background data-[state=active]:text-primary hover:text-primary/80 font-medium py-3 px-4 flex items-center justify-center gap-2 text-sm border-0"
+                className="rounded-xl transition-all duration-300 data-[state=active]:bg-primary/10 data-[state=active]:text-primary hover:text-primary/80 font-medium py-3 px-4 flex items-center justify-center gap-2 text-sm border-0"
               >
                 <Globe className="w-4 h-4" />
                 Public Rooms
@@ -896,7 +897,7 @@ const Index = () => {
             </TabsList>
 
             <TabsContent value="home" className="space-y-8">
-              <Card className="bg-background shadow-[12px_12px_24px_#d1d9e6,-12px_-12px_24px_#ffffff] dark:shadow-[12px_12px_24px_#0f1419,-12px_-12px_24px_#2a2a2a] border-0 rounded-2xl transition-all duration-500 hover:shadow-[16px_16px_32px_#d1d9e6,-16px_-16px_32px_#ffffff] dark:hover:shadow-[16px_16px_32px_#0f1419,-16px_-16px_32px_#2a2a2a] hover:scale-[1.01]">
+              <Card className="bg-background border border-border rounded-2xl transition-all duration-500 hover:scale-[1.01]">
                 <CardHeader className="text-center pb-6 pt-8">
                   <CardTitle className="text-3xl font-bold text-primary mb-2 flex items-center justify-center gap-3">
                     <Sparkles className="w-8 h-8 text-primary animate-pulse" />
@@ -907,19 +908,20 @@ const Index = () => {
                 <CardContent className="space-y-6 px-8 pb-8">
                   <div className="space-y-6">
                     <div className="flex gap-4">
-                      <div className="relative">
+                      <div className="relative flex-1">
                         <Key className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
                         <Input
                           value={sessionId}
                           onChange={(e) => setSessionId(e.target.value.toUpperCase())}
                           placeholder="Enter session ID"
                           maxLength={8}
-                          className="pl-12 bg-background shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl text-lg py-6 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:focus-visible:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a]"
+                          className="pl-12 border border-border rounded-xl text-lg py-6 focus-visible:ring-2 focus-visible:ring-primary/20"
                         />
                       </div>
                       <Button 
                         onClick={generateSessionId} 
-                        className="px-6 py-6 bg-background shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] hover:shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:hover:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl text-primary hover:text-primary transition-all duration-300 active:scale-95 flex items-center justify-center gap-2"
+                        variant="outline"
+                        className="px-6 py-6 rounded-xl transition-all duration-300 active:scale-95 flex items-center justify-center gap-2"
                       >
                         <Dice6 className="w-5 h-5" />
                         Generate
@@ -932,13 +934,13 @@ const Index = () => {
                         value={userName}
                         onChange={(e) => setUserName(e.target.value)}
                         placeholder="Enter your username"
-                        className="pl-12 bg-background shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl text-lg py-6 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:focus-visible:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a]"
+                        className="pl-12 border border-border rounded-xl text-lg py-6 focus-visible:ring-2 focus-visible:ring-primary/20"
                       />
                     </div>
 
                     <Button 
                       onClick={() => handleJoinRoom()} 
-                      className="w-full py-6 text-lg bg-primary shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] hover:shadow-[inset_6px_6px_12px_hsl(var(--primary)/0.3),inset_-6px_-6px_12px_hsl(var(--primary)/0.1)] border-0 rounded-xl font-semibold transition-all duration-300 hover:bg-primary/90 active:scale-95 flex items-center justify-center gap-3" 
+                      className="w-full py-6 text-lg rounded-xl font-semibold transition-all duration-300 active:scale-95 flex items-center justify-center gap-3" 
                       disabled={!sessionId || !userName}
                     >
                       <Zap className="w-5 h-5" />
@@ -971,13 +973,13 @@ const Index = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search rooms by name, owner, or session ID..."
-                  className="pl-14 py-6 text-lg bg-background shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:focus-visible:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a]"
+                  className="pl-14 py-6 text-lg border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-primary/20"
                 />
               </div>
 
               <div className="grid gap-6">
                 {filteredPublicRooms.length === 0 ? (
-                  <Card className="bg-background shadow-[12px_12px_24px_#d1d9e6,-12px_-12px_24px_#ffffff] dark:shadow-[12px_12px_24px_#0f1419,-12px_-12px_24px_#2a2a2a] border-0 rounded-2xl">
+                  <Card className="bg-background border border-border rounded-2xl">
                     <CardContent className="text-center py-12">
                       <Search className="w-16 h-16 text-muted-foreground/40 mx-auto mb-4" />
                       <p className="text-xl text-muted-foreground mb-2">
@@ -992,49 +994,50 @@ const Index = () => {
                   filteredPublicRooms.map((room, index) => (
                     <Card 
                       key={room.id} 
-                      className="cursor-pointer bg-background shadow-[12px_12px_24px_#d1d9e6,-12px_-12px_24px_#ffffff] dark:shadow-[12px_12px_24px_#0f1419,-12px_-12px_24px_#2a2a2a] hover:shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:hover:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-2xl transition-all duration-500 group hover:scale-[1.01] active:scale-95" 
+                      className="cursor-pointer bg-background border border-border hover:border-primary/50 rounded-2xl transition-all duration-500 group hover:scale-[1.01] active:scale-95" 
                       onClick={() => joinPublicRoom(room)}
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       <CardContent className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-4">
-                              <div className="w-4 h-4 bg-green-500 rounded-full shadow-[4px_4px_8px_#c8d2e5,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0a0a0a,-4px_-4px_8px_#353535] animate-pulse"></div>
-                              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
-                                {room.room_name}
-                              </h3>
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-4">
+                                <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
+                                <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+                                  {room.room_name}
+                                </h3>
+                              </div>
+                              <div className="space-y-3">
+                                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                  <Crown className="w-4 h-4 text-yellow-500" />
+                                  <span>Owner: <span className="font-medium">{room.owner_name}</span></span>
+                                </p>
+                                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                  <Key className="w-4 h-4 text-primary/60" />
+                                  Session: 
+                                  <span className="font-mono bg-muted px-3 py-1 rounded-lg text-sm">
+                                    {room.session_id}
+                                  </span>
+                                </p>
+                              </div>
                             </div>
-                            <div className="space-y-3">
-                              <p className="text-sm text-muted-foreground flex items-center gap-2">
-                                <Crown className="w-4 h-4 text-yellow-500" />
-                                <span>Owner: <span className="font-medium">{room.owner_name}</span></span>
-                              </p>
-                              <p className="text-sm text-muted-foreground flex items-center gap-2">
-                                <Key className="w-4 h-4 text-primary/60" />
-                                Session: 
-                                <span className="font-mono bg-background px-3 py-1 rounded-lg shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] dark:shadow-[inset_3px_3px_6px_#0f1419,inset_-3px_-3px_6px_#2a2a2a] text-sm">
-                                  {room.session_id}
-                                </span>
-                              </p>
+                            <div className="flex flex-col items-end gap-4">
+                              <Badge 
+                                className="bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold rounded-full flex items-center gap-2"
+                              >
+                                <Users className="w-4 h-4" />
+                                {room.user_count} {room.user_count === 1 ? 'user' : 'users'}
+                              </Badge>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="opacity-0 group-hover:opacity-100 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 px-4 py-2"
+                              >
+                                Join Now
+                                <Zap className="w-4 h-4" />
+                              </Button>
                             </div>
                           </div>
-                          <div className="flex flex-col items-end gap-4">
-                            <Badge 
-                              className="bg-primary text-primary-foreground shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f1419,-4px_-4px_8px_#2a2a2a] px-4 py-2 text-sm font-semibold rounded-full border-0 flex items-center gap-2"
-                            >
-                              <Users className="w-4 h-4" />
-                              {room.user_count} {room.user_count === 1 ? 'user' : 'users'}
-                            </Badge>
-                            <Button 
-                              size="sm" 
-                              className="bg-background shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f1419,-4px_-4px_8px_#2a2a2a] hover:shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] dark:hover:shadow-[inset_4px_4px_8px_#0f1419,inset_-4px_-4px_8px_#2a2a2a] border-0 rounded-lg text-primary hover:text-primary opacity-0 group-hover:opacity-100 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 px-4 py-2"
-                            >
-                              Join Now
-                              <Zap className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
                       </CardContent>
                     </Card>
                   ))
@@ -1047,23 +1050,57 @@ const Index = () => {
         <Dialog open={showRoomTypeDialog} onOpenChange={setShowRoomTypeDialog}>
           <DialogContent className="slide-enter">
             <DialogHeader className="fade-enter">
-              <DialogTitle>Room doesn't exist - Create new room</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                Create New Room
+              </DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-6">
               <p className="text-sm text-muted-foreground fade-enter">
-                Session ID "{sessionId}" doesn't exist. Choose room type to create:
+                Session ID "{sessionId}" doesn't exist. Let's create a new room:
               </p>
-              <RadioGroup value={roomType} onValueChange={(v) => setRoomType(v as any)} className="space-y-2">
-                <div className="flex items-center space-x-2 fade-enter hover-scale transition-all duration-200">
-                  <RadioGroupItem value="public" id="public" />
-                  <Label htmlFor="public">Public - Visible to everyone</Label>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="roomName" className="text-sm font-medium flex items-center gap-2 mb-2">
+                    <Home className="w-4 h-4" />
+                    Room Name (optional)
+                  </Label>
+                  <Input
+                    id="roomName"
+                    value={roomName}
+                    onChange={(e) => setRoomName(e.target.value)}
+                    placeholder={`Room-${sessionId}`}
+                    className="border border-border rounded-lg focus-visible:ring-2 focus-visible:ring-primary/20"
+                  />
                 </div>
-                <div className="flex items-center space-x-2 fade-enter hover-scale transition-all duration-200">
-                  <RadioGroupItem value="private" id="private" />
-                  <Label htmlFor="private">Private - Only accessible with session ID</Label>
+                
+                <div>
+                  <Label className="text-sm font-medium flex items-center gap-2 mb-3">
+                    <Globe className="w-4 h-4" />
+                    Room Type
+                  </Label>
+                  <RadioGroup value={roomType} onValueChange={(v) => setRoomType(v as any)} className="space-y-3">
+                    <div className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                      <RadioGroupItem value="public" id="public" />
+                      <div className="flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-green-500" />
+                        <Label htmlFor="public" className="cursor-pointer">Public - Visible to everyone</Label>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                      <RadioGroupItem value="private" id="private" />
+                      <div className="flex items-center gap-2">
+                        <Key className="w-4 h-4 text-blue-500" />
+                        <Label htmlFor="private" className="cursor-pointer">Private - Only accessible with session ID</Label>
+                      </div>
+                    </div>
+                  </RadioGroup>
                 </div>
-              </RadioGroup>
-              <Button onClick={() => handleJoinRoom(true)} className="w-full animated-button hover-glow">
+              </div>
+              
+              <Button onClick={() => handleJoinRoom(true)} className="w-full py-3 flex items-center justify-center gap-2">
+                <Zap className="w-4 h-4" />
                 Create Room
               </Button>
             </div>
@@ -1076,7 +1113,7 @@ const Index = () => {
               variant="ghost"
               size="sm"
               onClick={() => window.open('https://www.instagram.com/with._.hacker/', '_blank')}
-              className="flex items-center justify-center gap-2 text-xs bg-background shadow-[4px_4px_8px_#d1d9e6,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f1419,-4px_-4px_8px_#2a2a2a] hover:shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] dark:hover:shadow-[inset_4px_4px_8px_#0f1419,inset_-4px_-4px_8px_#2a2a2a] border-0 rounded-lg transition-all duration-300 active:scale-95 px-3 py-2"
+              className="flex items-center justify-center gap-2 text-xs transition-all duration-300 active:scale-95 px-3 py-2"
             >
               <Instagram className="w-4 h-4" />
               Made By @with._.hacker
