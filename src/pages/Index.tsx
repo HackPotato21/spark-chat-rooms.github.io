@@ -865,7 +865,7 @@ const Index = () => {
                   setTimeout(() => document.body.classList.remove('theme-transitioning'), 800);
                   setTheme(theme === 'dark' ? 'light' : 'dark');
                 }}
-                className="w-14 h-14 rounded-full transition-all duration-300 border border-border hover:border-primary/50 flex items-center justify-center"
+                className="w-14 h-14 rounded-full shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] hover:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:hover:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a] transition-all duration-300 bg-background border-0 flex items-center justify-center"
               >
                 {theme === 'dark' ? 
                   <Sun className="w-6 h-6 transition-transform duration-500 hover:rotate-180" /> : 
@@ -879,17 +879,17 @@ const Index = () => {
           </div>
 
           <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)} className="w-full slide-enter">
-            <TabsList className="grid w-full grid-cols-2 bg-background rounded-2xl p-2 mb-8 border-0">
+            <TabsList className="grid w-full grid-cols-2 bg-background rounded-2xl p-2 mb-8 shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a] border-0">
               <TabsTrigger 
                 value="home" 
-                className="rounded-xl transition-all duration-300 data-[state=active]:bg-primary/10 data-[state=active]:text-primary hover:text-primary/80 font-medium py-3 px-4 flex items-center justify-center gap-2 text-sm border-0"
+                className="rounded-xl transition-all duration-300 data-[state=active]:shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:data-[state=active]:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] data-[state=active]:bg-background data-[state=active]:text-primary hover:text-primary/80 font-medium py-3 px-4 flex items-center justify-center gap-2 text-sm border-0"
               >
                 <Home className="w-4 h-4" />
                 Home
               </TabsTrigger>
               <TabsTrigger 
                 value="publicRooms" 
-                className="rounded-xl transition-all duration-300 data-[state=active]:bg-primary/10 data-[state=active]:text-primary hover:text-primary/80 font-medium py-3 px-4 flex items-center justify-center gap-2 text-sm border-0"
+                className="rounded-xl transition-all duration-300 data-[state=active]:shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:data-[state=active]:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] data-[state=active]:bg-background data-[state=active]:text-primary hover:text-primary/80 font-medium py-3 px-4 flex items-center justify-center gap-2 text-sm border-0"
               >
                 <Globe className="w-4 h-4" />
                 Public Rooms
@@ -915,13 +915,12 @@ const Index = () => {
                           onChange={(e) => setSessionId(e.target.value.toUpperCase())}
                           placeholder="Enter session ID"
                           maxLength={8}
-                          className="pl-12 border border-border rounded-xl text-lg py-6 focus-visible:ring-2 focus-visible:ring-primary/20"
+                          className="pl-12 bg-background shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl text-lg py-6 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:focus-visible:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a]"
                         />
                       </div>
                       <Button 
                         onClick={generateSessionId} 
-                        variant="outline"
-                        className="px-6 py-6 rounded-xl transition-all duration-300 active:scale-95 flex items-center justify-center gap-2"
+                        className="px-6 py-6 bg-background shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] hover:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:hover:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a] border-0 rounded-xl text-primary hover:text-primary transition-all duration-300 active:scale-95 flex items-center justify-center gap-2"
                       >
                         <Dice6 className="w-5 h-5" />
                         Generate
@@ -934,7 +933,7 @@ const Index = () => {
                         value={userName}
                         onChange={(e) => setUserName(e.target.value)}
                         placeholder="Enter your username"
-                        className="pl-12 border border-border rounded-xl text-lg py-6 focus-visible:ring-2 focus-visible:ring-primary/20"
+                        className="pl-12 bg-background shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl text-lg py-6 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:focus-visible:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a]"
                       />
                     </div>
 
@@ -973,7 +972,7 @@ const Index = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search rooms by name, owner, or session ID..."
-                  className="pl-14 py-6 text-lg border border-border rounded-xl focus-visible:ring-2 focus-visible:ring-primary/20"
+                  className="pl-14 py-6 text-lg bg-background shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] border-0 rounded-xl focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:focus-visible:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a]"
                 />
               </div>
 
@@ -1015,7 +1014,7 @@ const Index = () => {
                                 <p className="text-sm text-muted-foreground flex items-center gap-2">
                                   <Key className="w-4 h-4 text-primary/60" />
                                   Session: 
-                                  <span className="font-mono bg-muted px-3 py-1 rounded-lg text-sm">
+                                  <span className="font-mono bg-background px-3 py-1 rounded-lg shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] dark:shadow-[inset_3px_3px_6px_#0f1419,inset_-3px_-3px_6px_#2a2a2a] text-sm">
                                     {room.session_id}
                                   </span>
                                 </p>
@@ -1071,7 +1070,7 @@ const Index = () => {
                     value={roomName}
                     onChange={(e) => setRoomName(e.target.value)}
                     placeholder={`Room-${sessionId}`}
-                    className="border border-border rounded-lg focus-visible:ring-2 focus-visible:ring-primary/20"
+                    className="border border-border rounded-lg shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] dark:shadow-[inset_6px_6px_12px_#0f1419,inset_-6px_-6px_12px_#2a2a2a] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:focus-visible:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a]"
                   />
                 </div>
                 
@@ -1081,14 +1080,14 @@ const Index = () => {
                     Room Type
                   </Label>
                   <RadioGroup value={roomType} onValueChange={(v) => setRoomType(v as any)} className="space-y-3">
-                    <div className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex items-center space-x-3 p-3 rounded-lg shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] dark:shadow-[inset_3px_3px_6px_#0f1419,inset_-3px_-3px_6px_#2a2a2a] border-0 hover:shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] dark:hover:shadow-[inset_4px_4px_8px_#0f1419,inset_-4px_-4px_8px_#2a2a2a] transition-all cursor-pointer">
                       <RadioGroupItem value="public" id="public" />
                       <div className="flex items-center gap-2">
                         <Globe className="w-4 h-4 text-green-500" />
                         <Label htmlFor="public" className="cursor-pointer">Public - Visible to everyone</Label>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex items-center space-x-3 p-3 rounded-lg shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] dark:shadow-[inset_3px_3px_6px_#0f1419,inset_-3px_-3px_6px_#2a2a2a] border-0 hover:shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] dark:hover:shadow-[inset_4px_4px_8px_#0f1419,inset_-4px_-4px_8px_#2a2a2a] transition-all cursor-pointer">
                       <RadioGroupItem value="private" id="private" />
                       <div className="flex items-center gap-2">
                         <Key className="w-4 h-4 text-blue-500" />
