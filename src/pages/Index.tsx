@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Crown, Users, Send, Image, Video, X, Instagram, Moon, Sun, Search, Home, Globe, Key, User, Dice6, Sparkles, Zap } from 'lucide-react';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from 'next-themes';
 
 interface Message {
   id: string;
