@@ -10,8 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Crown, Users, Send, Image, Video, X, Instagram, Moon, Sun, Search, Home, Globe, Key, User, Dice6, Sparkles, Zap } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/components/theme-provider';
 
 interface Message {
   id: string;
@@ -21,7 +22,9 @@ interface Message {
   media_type: string | null;
   created_at: string;
   room_id: string;
+  
 }
+
 
 interface Room {
   id: string;
@@ -187,6 +190,7 @@ const Index = () => {
     }
     setSessionId(result);
   };
+
 
   // Load public rooms with real-time updates
   const loadPublicRooms = async () => {
@@ -749,7 +753,7 @@ const Index = () => {
                     
                     {message.message && <div>{message.message}</div>}
                     
-                    <div className="text-xs opacity-70 mt-1">
+                    <div className="text-xs opacity-70">
                       {formatTime(message.created_at)}
                     </div>
                   </div>
