@@ -957,16 +957,16 @@ const Index = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="publicRooms" className="space-y-8">
+            <TabsContent value="publicRooms" className="space-y-12 pt-4">
               <div className="text-center fade-enter">
-                <h2 className="text-4xl font-bold text-primary mb-2 flex items-center justify-center gap-3">
+                <h2 className="text-4xl font-bold text-primary mb-6 flex items-center justify-center gap-4">
                   <Globe className="w-10 h-10 text-primary animate-pulse" />
                   Discover Public Rooms
                 </h2>
-                <p className="text-muted-foreground">Join vibrant communities and start chatting instantly</p>
+                <p className="text-muted-foreground mb-8">Join vibrant communities and start chatting instantly</p>
               </div>
 
-              <div className="relative slide-enter">
+              <div className="relative slide-enter mb-8">
                 <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
                 <Input
                   value={searchQuery}
