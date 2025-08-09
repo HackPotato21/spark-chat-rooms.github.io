@@ -882,14 +882,14 @@ const Index = () => {
             <TabsList className="grid w-full grid-cols-2 bg-transparent rounded-2xl p-3 mb-8 border-0 gap-4">
               <TabsTrigger 
                 value="home" 
-                className="rounded-2xl transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=inactive]:bg-background data-[state=inactive]:text-muted-foreground hover:text-primary hover:scale-105 active:scale-95 font-medium py-4 px-6 flex items-center justify-center gap-3 text-sm border-0 min-h-[60px]"
+                className="rounded-2xl transition-all duration-300 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-lg data-[state=inactive]:bg-card data-[state=inactive]:text-muted-foreground data-[state=inactive]:border data-[state=inactive]:border-border hover:text-foreground hover:scale-105 active:scale-95 font-medium py-4 px-6 flex items-center justify-center gap-3 text-sm min-h-[60px]"
               >
                 <Home className="w-5 h-5" />
                 Home
               </TabsTrigger>
               <TabsTrigger 
                 value="publicRooms" 
-                className="rounded-2xl transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=inactive]:bg-background data-[state=inactive]:text-muted-foreground hover:text-primary hover:scale-105 active:scale-95 font-medium py-4 px-6 flex items-center justify-center gap-3 text-sm border-0 min-h-[60px]"
+                className="rounded-2xl transition-all duration-300 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-lg data-[state=inactive]:bg-card data-[state=inactive]:text-muted-foreground data-[state=inactive]:border data-[state=inactive]:border-border hover:text-foreground hover:scale-105 active:scale-95 font-medium py-4 px-6 flex items-center justify-center gap-3 text-sm min-h-[60px]"
               >
                 <Globe className="w-5 h-5" />
                 Public Rooms
