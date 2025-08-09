@@ -879,19 +879,19 @@ const Index = () => {
           </div>
 
           <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as any)} className="w-full slide-enter">
-            <TabsList className="grid w-full grid-cols-2 bg-background rounded-2xl p-2 mb-8 shadow-[inset_8px_8px_16px_#d1d9e6,inset_-8px_-8px_16px_#ffffff] dark:shadow-[inset_8px_8px_16px_#0f1419,inset_-8px_-8px_16px_#2a2a2a] border-0">
+            <TabsList className="grid w-full grid-cols-2 bg-transparent rounded-2xl p-3 mb-8 border-0 gap-4">
               <TabsTrigger 
                 value="home" 
-                className="rounded-xl transition-all duration-300 data-[state=active]:shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:data-[state=active]:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] data-[state=active]:bg-background data-[state=active]:text-primary hover:text-primary/80 font-medium py-3 px-4 flex items-center justify-center gap-2 text-sm border-0"
+                className="rounded-2xl transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=inactive]:bg-background data-[state=inactive]:text-muted-foreground hover:text-primary hover:scale-105 active:scale-95 font-medium py-4 px-6 flex items-center justify-center gap-3 text-sm border-0 min-h-[60px]"
               >
-                <Home className="w-4 h-4" />
+                <Home className="w-5 h-5" />
                 Home
               </TabsTrigger>
               <TabsTrigger 
                 value="publicRooms" 
-                className="rounded-xl transition-all duration-300 data-[state=active]:shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] dark:data-[state=active]:shadow-[6px_6px_12px_#0f1419,-6px_-6px_12px_#2a2a2a] data-[state=active]:bg-background data-[state=active]:text-primary hover:text-primary/80 font-medium py-3 px-4 flex items-center justify-center gap-2 text-sm border-0"
+                className="rounded-2xl transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=inactive]:bg-background data-[state=inactive]:text-muted-foreground hover:text-primary hover:scale-105 active:scale-95 font-medium py-4 px-6 flex items-center justify-center gap-3 text-sm border-0 min-h-[60px]"
               >
-                <Globe className="w-4 h-4" />
+                <Globe className="w-5 h-5" />
                 Public Rooms
               </TabsTrigger>
             </TabsList>
