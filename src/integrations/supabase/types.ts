@@ -157,10 +157,6 @@ export type Database = {
         Args: { room_uuid: string }
         Returns: number
       }
-      user_has_room_access: {
-        Args: { room_uuid: string; username: string }
-        Returns: boolean
-      }
     }
     Enums: {
       room_type: "public" | "private"
